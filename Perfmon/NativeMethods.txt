@@ -1,0 +1,12 @@
+GetCursorPos
+WindowFromPoint
+GetWindowThreadProcessId
+PdhOpenQuery
+PdhAddCounter
+PdhCollectQueryData
+PdhGetRawCounterValue
+PdhCalculateCounterFromRawValue
+PdhGetRawCounterArray
+PdhGetFormattedCounterArray
+PdhRemoveCounter
+PdhCloseQuery
