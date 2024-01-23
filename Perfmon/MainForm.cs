@@ -538,8 +538,16 @@ namespace PerfMonitor
                 var v = _monitorManager[pid];
                 if ( !v.IsStop() )
                 {
-                    DialogResult dr = MessageBox.Show("确定要删除？","确认", MessageBoxButtons.OKCancel);
-                    if(dr == DialogResult.OK )
+                    Point loc = this.Location;
+                    Size sz = this.Size;
+                    Point location = new Point(loc.X + sz.Width /2 , loc.Y + sz.Height/2);
+                    CustomMessageBox mf = new(this, "确定要删除？","确认", location, MessageBoxButtons.OKCancel);
+                    location = new Point(loc.X + (sz.Width - mf.Size.Width) /2, loc.Y + (sz.Height - mf.Size.Height)/ 2);
+                    mf.Location = location;
+                    mf.ShowDialog();
+                    DialogResult dr = mf.ShowResult();
+                    /*DialogResult dr = MessageBox.Show("确定要删除？","确认", MessageBoxButtons.OKCancel);*/
+                    if (dr == DialogResult.OK )
                     {
                         v.Stop();
                     }else if(dr == DialogResult.Cancel )
