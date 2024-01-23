@@ -245,7 +245,10 @@ namespace PerfMonitor
             _netspeedDetail.send = 0;
             _netspeedDetail.received = 0;
 
-            TraceEventSession session = new("Perfmon_KernelAndClrEventsSession" + _pid, TraceEventSessionOptions.NoPerProcessorBuffering | TraceEventSessionOptions.Create);
+            TraceEventSession session = new("Perfmon_KernelAndClrEventsSession@" + _pid, TraceEventSessionOptions.NoPerProcessorBuffering | TraceEventSessionOptions.Create)
+            {
+                StopOnDispose = true
+            };
             session.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP);
 
             session.Source.Kernel.TcpIpRecv += data =>
