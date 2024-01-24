@@ -31,8 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VisualForm));
             formsPlotProcCPU = new ScottPlot.FormsPlot();
             formsPlotProcMem = new ScottPlot.FormsPlot();
-            formsPlotUpLink = new ScottPlot.FormsPlot();
-            formsPlotSysCpu = new ScottPlot.FormsPlot();
+            formsPlotLink = new ScottPlot.FormsPlot();
+            formsPlotCpuPerf = new ScottPlot.FormsPlot();
             tableLayoutPanel1 = new TableLayoutPanel();
             BtnFull = new Button();
             BtnSlide = new Button();
@@ -57,23 +57,23 @@
             formsPlotProcMem.Size = new Size(890, 187);
             formsPlotProcMem.TabIndex = 1;
             // 
-            // formsPlotUpLink
+            // formsPlotLink
             // 
-            formsPlotUpLink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            formsPlotUpLink.Location = new Point(4, 389);
-            formsPlotUpLink.Margin = new Padding(4, 3, 4, 3);
-            formsPlotUpLink.Name = "formsPlotUpLink";
-            formsPlotUpLink.Size = new Size(890, 187);
-            formsPlotUpLink.TabIndex = 2;
+            formsPlotLink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            formsPlotLink.Location = new Point(4, 389);
+            formsPlotLink.Margin = new Padding(4, 3, 4, 3);
+            formsPlotLink.Name = "formsPlotLink";
+            formsPlotLink.Size = new Size(890, 187);
+            formsPlotLink.TabIndex = 2;
             // 
-            // formsPlotSysCpu
+            // formsPlotCpuPerf
             // 
-            formsPlotSysCpu.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            formsPlotSysCpu.Location = new Point(4, 582);
-            formsPlotSysCpu.Margin = new Padding(4, 3, 4, 3);
-            formsPlotSysCpu.Name = "formsPlotSysCpu";
-            formsPlotSysCpu.Size = new Size(890, 189);
-            formsPlotSysCpu.TabIndex = 3;
+            formsPlotCpuPerf.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            formsPlotCpuPerf.Location = new Point(4, 582);
+            formsPlotCpuPerf.Margin = new Padding(4, 3, 4, 3);
+            formsPlotCpuPerf.Name = "formsPlotCpuPerf";
+            formsPlotCpuPerf.Size = new Size(890, 189);
+            formsPlotCpuPerf.TabIndex = 3;
             // 
             // tableLayoutPanel1
             // 
@@ -81,9 +81,9 @@
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(formsPlotProcCPU, 0, 0);
-            tableLayoutPanel1.Controls.Add(formsPlotSysCpu, 0, 3);
             tableLayoutPanel1.Controls.Add(formsPlotProcMem, 0, 1);
-            tableLayoutPanel1.Controls.Add(formsPlotUpLink, 0, 2);
+            tableLayoutPanel1.Controls.Add(formsPlotLink, 0, 2);
+            tableLayoutPanel1.Controls.Add(formsPlotCpuPerf, 0, 3);
             tableLayoutPanel1.Location = new Point(12, 37);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 4;
@@ -102,7 +102,7 @@
             BtnFull.Name = "BtnFull";
             BtnFull.Size = new Size(71, 24);
             BtnFull.TabIndex = 5;
-            BtnFull.Text = "全部";
+            BtnFull.Text = "历史";
             BtnFull.UseVisualStyleBackColor = true;
             BtnFull.Click += BtnFull_Click;
             // 
@@ -114,7 +114,7 @@
             BtnSlide.Name = "BtnSlide";
             BtnSlide.Size = new Size(71, 24);
             BtnSlide.TabIndex = 6;
-            BtnSlide.Text = "窗口";
+            BtnSlide.Text = "实时";
             BtnSlide.UseVisualStyleBackColor = true;
             BtnSlide.Click += BtnSlide_Click;
             // 
@@ -138,8 +138,8 @@
 
         private ScottPlot.FormsPlot formsPlotProcCPU;
         private ScottPlot.FormsPlot formsPlotProcMem;
-        private ScottPlot.FormsPlot formsPlotUpLink;
-        private ScottPlot.FormsPlot formsPlotSysCpu;
+        private ScottPlot.FormsPlot formsPlotLink;
+        private ScottPlot.FormsPlot formsPlotCpuPerf;
         private TableLayoutPanel tableLayoutPanel1;
         private Button BtnFull;
         private Button BtnSlide;

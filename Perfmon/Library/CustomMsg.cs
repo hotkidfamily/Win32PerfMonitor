@@ -6,7 +6,6 @@ namespace PerfMonitor.Library
     class CustomMessageBox : Form
     {
         private uint btnid = 0;
-        private readonly DialogResult dr = DialogResult.Cancel;
 
         public DialogResult ShowResult() { return btnid == 1 ? DialogResult.OK : DialogResult.Cancel; }
 

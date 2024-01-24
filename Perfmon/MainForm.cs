@@ -3,6 +3,7 @@ using PerfMonitor.Library;
 using PerfMonitor.Properties;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Management;
 using Windows.Win32;
 
@@ -13,7 +14,7 @@ namespace PerfMonitor
         private static int _phyMemTotal = 0;
         private static readonly List<RunStatusItem> _monitorResult = new();
         private readonly HistoryController _historyController;
-        private ScottPlot.Plottable.DataLogger _cpuLogger = default!;
+        private ScottPlot.Plottable.DataStreamer  _cpuStreamer = default!;
 
         internal enum MonitorStatus : uint
         {
@@ -153,9 +154,9 @@ namespace PerfMonitor
             PlotSysCpuUsage.Configuration.LeftClickDragPan = false;
             ScottPlot.PixelPadding padding = new(50, 4, 4, 2);
             PlotSysCpuUsage.Plot.ManualDataArea(padding);
-            _cpuLogger = PlotSysCpuUsage.Plot.AddDataLogger();
-            _cpuLogger.LineWidth = 3;
-            _cpuLogger.ViewSlide(width: 200);
+            _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(120);
+            _cpuStreamer.LineWidth = 1;
+            _cpuStreamer.ViewScrollLeft();
             PlotSysCpuUsage.Refresh();
 
         }
@@ -299,7 +300,7 @@ namespace PerfMonitor
                     labelCpuAndMem.Text = sb;
                 })
                 );
-                _cpuLogger.Add(_cpuLogger.Count, _sysCpu);
+                _cpuStreamer.Add(_sysCpu);
                 PlotSysCpuUsage.Invoke(() => {
                     PlotSysCpuUsage.Refresh();
                 });
@@ -310,7 +311,7 @@ namespace PerfMonitor
             }
 
             cpuTotal?.Dispose();
-            _cpuLogger.Clear();
+            _cpuStreamer.Clear();
         }
 
         private void TextBoxPID_KeyPress (object sender, KeyPressEventArgs e)

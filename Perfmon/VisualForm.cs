@@ -52,7 +52,7 @@ namespace PerfMonitor
 
         private void ConstructTabControl()
         {
-            ScottPlot.PixelPadding padding = new(85, 4, 4, 2);
+            ScottPlot.PixelPadding padding = new(85, 4, 18, 2);
 
             formsPlotProcCPU.Name = TAB_HEADER_CPU;
             formsPlotProcCPU.Plot.YLabel("CPU (%)");
@@ -63,7 +63,6 @@ namespace PerfMonitor
             formsPlotProcCPU.Configuration.LeftClickDragPan = false;
             formsPlotProcCPU.Plot.ManualDataArea(padding);
             _procLogger = formsPlotProcCPU.Plot.AddDataLogger();
-            _procLogger.LineWidth = 3;
             _procLogger.ViewSlide(width: 200);
 
 
@@ -76,52 +75,47 @@ namespace PerfMonitor
             formsPlotProcMem.Configuration.LeftClickDragPan = false;
             formsPlotProcMem.Plot.ManualDataArea(padding);
             _memLogger = formsPlotProcMem.Plot.AddDataLogger();
-            _memLogger.LineWidth = 3;
             _memLogger.ViewSlide(width: 200);
 
 
-            formsPlotUpLink.Name = TAB_HEADER_UPLINK;
-            formsPlotUpLink.Plot.YLabel("Traffic (Kb/s)");
-            formsPlotUpLink.Plot.YAxis.SetBoundary(-5);
-            formsPlotUpLink.Plot.XAxis.SetBoundary(0);
-            formsPlotUpLink.Plot.Legend().Location = Alignment.UpperRight;
-            formsPlotUpLink.Configuration.RightClickDragZoom = false;
-            formsPlotUpLink.Configuration.MiddleClickDragZoom = false;
-            formsPlotUpLink.Configuration.LeftClickDragPan = false;
-            formsPlotUpLink.Plot.ManualDataArea(padding);
-            _uplinkLogger = formsPlotUpLink.Plot.AddDataLogger();
-            _uplinkLogger.LineWidth = 3;
+            formsPlotLink.Name = TAB_HEADER_UPLINK;
+            formsPlotLink.Plot.YLabel("Traffic (Kb/s)");
+            formsPlotLink.Plot.YAxis.SetBoundary(-5);
+            formsPlotLink.Plot.XAxis.SetBoundary(0);
+            formsPlotLink.Plot.Legend().Location = Alignment.UpperRight;
+            formsPlotLink.Configuration.RightClickDragZoom = false;
+            formsPlotLink.Configuration.MiddleClickDragZoom = false;
+            formsPlotLink.Configuration.LeftClickDragPan = false;
+            formsPlotLink.Plot.ManualDataArea(padding);
+            _uplinkLogger = formsPlotLink.Plot.AddDataLogger();
             _uplinkLogger.ViewSlide(width: 200);
             _uplinkLogger.Label = "Up";
-            _downlinkLogger = formsPlotUpLink.Plot.AddDataLogger();
-            _downlinkLogger.LineWidth = 3;
+            _downlinkLogger = formsPlotLink.Plot.AddDataLogger();
             _downlinkLogger.ViewSlide(width: 200);
             _downlinkLogger.Label = "Down";
 
 
-            formsPlotSysCpu.Name = TAB_HEADER_SYSTEM;
-            formsPlotSysCpu.Plot.YLabel("System CPU (%)");
-            formsPlotSysCpu.Plot.YAxis.SetBoundary(-5, 200);
-            formsPlotSysCpu.Plot.XAxis.SetBoundary(0);
-            formsPlotSysCpu.Plot.Legend().Location = Alignment.UpperRight;
-            formsPlotSysCpu.Configuration.RightClickDragZoom = false;
-            formsPlotSysCpu.Configuration.MiddleClickDragZoom = false;
-            formsPlotSysCpu.Configuration.LeftClickDragPan = false;
-            formsPlotSysCpu.Plot.ManualDataArea(padding);
-            _sysLogger = formsPlotSysCpu.Plot.AddDataLogger();
-            _sysLogger.LineWidth = 3;
+            formsPlotCpuPerf.Name = TAB_HEADER_SYSTEM;
+            formsPlotCpuPerf.Plot.YLabel("System CPU (%)");
+            formsPlotCpuPerf.Plot.YAxis.SetBoundary(-5, 200);
+            formsPlotCpuPerf.Plot.XAxis.SetBoundary(0);
+            formsPlotCpuPerf.Plot.Legend().Location = Alignment.UpperRight;
+            formsPlotCpuPerf.Configuration.RightClickDragZoom = false;
+            formsPlotCpuPerf.Configuration.MiddleClickDragZoom = false;
+            formsPlotCpuPerf.Configuration.LeftClickDragPan = false;
+            formsPlotCpuPerf.Plot.ManualDataArea(padding);
+            _sysLogger = formsPlotCpuPerf.Plot.AddDataLogger();
             _sysLogger.ViewSlide(width: 200);
             _sysLogger.Label = "sys";
-            _procPerfLogger = formsPlotSysCpu.Plot.AddDataLogger();
-            _procPerfLogger.LineWidth = 3;
+            _procPerfLogger = formsPlotCpuPerf.Plot.AddDataLogger();
             _procPerfLogger.ViewSlide(width: 200);
             _procPerfLogger.Label = "cur";
 
 
             formsPlotProcCPU.Refresh();
             formsPlotProcMem.Refresh();
-            formsPlotUpLink.Refresh();
-            formsPlotSysCpu.Refresh();
+            formsPlotLink.Refresh();
+            formsPlotCpuPerf.Refresh();
         }
 
         async Task UpdateInfo()
@@ -161,10 +155,14 @@ namespace PerfMonitor
                     _sysLogger.Add(_sysLogger.Count, records[i].SysCpu);
                     _procPerfLogger.Add(_procPerfLogger.Count, records[i].CpuPerf);
                 }
-                formsPlotSysCpu.Refresh();
-                formsPlotProcCPU.Refresh();
-                formsPlotProcMem.Refresh();
-                formsPlotUpLink.Refresh();
+                
+                if( length > 0 )
+                {
+                    formsPlotProcCPU.Refresh();
+                    formsPlotProcMem.Refresh();
+                    formsPlotLink.Refresh();
+                    formsPlotCpuPerf.Refresh();
+                }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(1000));
             }
@@ -175,10 +173,10 @@ namespace PerfMonitor
             _uplinkLogger?.Clear();
             _downlinkLogger?.Clear();
             _sysLogger?.Clear();
-            formsPlotSysCpu?.Dispose();
+            formsPlotCpuPerf?.Dispose();
             formsPlotProcCPU?.Dispose();
             formsPlotProcMem?.Dispose();
-            formsPlotUpLink?.Dispose();
+            formsPlotLink?.Dispose();
         }
 
         private void BtnFull_Click(object sender, EventArgs e)
@@ -189,6 +187,10 @@ namespace PerfMonitor
             _uplinkLogger.ViewFull();
             _downlinkLogger?.ViewFull();
             _sysLogger.ViewFull();
+            formsPlotProcCPU.Refresh();
+            formsPlotProcMem.Refresh();
+            formsPlotLink.Refresh();
+            formsPlotCpuPerf.Refresh();
         }
 
         private void BtnSlide_Click(object sender, EventArgs e)
@@ -199,6 +201,10 @@ namespace PerfMonitor
             _uplinkLogger.ViewSlide();
             _downlinkLogger?.ViewSlide();
             _sysLogger.ViewSlide();
+            formsPlotProcCPU.Refresh();
+            formsPlotProcMem.Refresh();
+            formsPlotLink.Refresh();
+            formsPlotCpuPerf.Refresh();
         }
     }
 }
