@@ -71,7 +71,7 @@
             // 
             labelCpuAndMem.Anchor =  AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             labelCpuAndMem.BorderStyle = BorderStyle.FixedSingle;
-            labelCpuAndMem.Location = new Point(12, 506);
+            labelCpuAndMem.Location = new Point(12, 528);
             labelCpuAndMem.Margin = new Padding(1);
             labelCpuAndMem.Name = "labelCpuAndMem";
             labelCpuAndMem.ReadOnly = true;
@@ -93,7 +93,7 @@
             LVMonitorDetail.Location = new Point(12, 87);
             LVMonitorDetail.MultiSelect = false;
             LVMonitorDetail.Name = "LVMonitorDetail";
-            LVMonitorDetail.Size = new Size(899, 310);
+            LVMonitorDetail.Size = new Size(899, 245);
             LVMonitorDetail.TabIndex = 3;
             LVMonitorDetail.UseCompatibleStateImageBehavior = false;
             LVMonitorDetail.View = View.Details;
@@ -339,17 +339,17 @@
             // 
             PlotSysCpuUsage.Anchor =  AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PlotSysCpuUsage.BorderStyle = BorderStyle.FixedSingle;
-            PlotSysCpuUsage.Location = new Point(12, 400);
+            PlotSysCpuUsage.Location = new Point(12, 336);
             PlotSysCpuUsage.Margin = new Padding(1);
             PlotSysCpuUsage.Name = "PlotSysCpuUsage";
-            PlotSysCpuUsage.Size = new Size(898, 100);
+            PlotSysCpuUsage.Size = new Size(898, 189);
             PlotSysCpuUsage.TabIndex = 8;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(924, 541);
+            ClientSize = new Size(924, 554);
             Controls.Add(PlotSysCpuUsage);
             Controls.Add(btnShotProcess);
             Controls.Add(flowLayoutPanel1);

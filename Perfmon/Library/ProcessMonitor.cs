@@ -197,7 +197,12 @@ namespace PerfMonitor
                     long firstMonitorTicks = sw.ElapsedMilliseconds;
                     while ( !_endTask )
                     {
-                        _process.Refresh();
+                        try
+                        {
+                            _process.Refresh();
+                        }
+                        catch ( Exception e ) { }
+                        
                         _onceRes.VMem = _process.VirtualMemorySize64 / 1048576.0f;
                         _onceRes.PhyMem = _process.WorkingSet64 / 1048576.0f;
                         _onceRes.TotalMem = _onceRes.VMem + _onceRes.PhyMem;

@@ -154,7 +154,7 @@ namespace PerfMonitor
             PlotSysCpuUsage.Configuration.LeftClickDragPan = false;
             ScottPlot.PixelPadding padding = new(50, 4, 4, 2);
             PlotSysCpuUsage.Plot.ManualDataArea(padding);
-            _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(120);
+            _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
             _cpuStreamer.LineWidth = 1;
             _cpuStreamer.ViewScrollLeft();
             PlotSysCpuUsage.Refresh();
@@ -244,10 +244,10 @@ namespace PerfMonitor
                             var item = LVMonitorDetail.Items[index];
                             for ( int i = 1; i < _colHeaders.Length; i++ )
                             {
-                                item.SubItems[i].Text = values[i-1];
+                                item.SubItems[i].Text = values[i - 1];
                             }
 
-                            if ( ctx.history != null)
+                            if ( ctx.history != null )
                                 item.SubItems[0].Text = ctx.history.Marker;
 
                             if ( res.ExcuteStatus == "exit" )
@@ -301,7 +301,8 @@ namespace PerfMonitor
                 })
                 );
                 _cpuStreamer.Add(_sysCpu);
-                PlotSysCpuUsage.Invoke(() => {
+                PlotSysCpuUsage.Invoke(() =>
+                {
                     PlotSysCpuUsage.Refresh();
                 });
 
@@ -543,14 +544,15 @@ namespace PerfMonitor
                     Size sz = this.Size;
                     Point location = new Point(loc.X + sz.Width /2 , loc.Y + sz.Height/2);
                     CustomMessageBox mf = new(this, "确定要删除？","确认", location, MessageBoxButtons.OKCancel);
-                    location = new Point(loc.X + (sz.Width - mf.Size.Width) /2, loc.Y + (sz.Height - mf.Size.Height)/ 2);
+                    location = new Point(loc.X + (sz.Width - mf.Size.Width) / 2, loc.Y + (sz.Height - mf.Size.Height) / 2);
                     mf.Location = location;
                     mf.ShowDialog();
                     DialogResult dr = mf.ShowResult();
-                    if (dr == DialogResult.OK )
+                    if ( dr == DialogResult.OK )
                     {
                         v.Stop();
-                    }else if(dr == DialogResult.Cancel )
+                    }
+                    else if ( dr == DialogResult.Cancel )
                     {
                         return;
                     }
@@ -560,7 +562,7 @@ namespace PerfMonitor
                     _monitorManager.Remove(pid);
                     var v1 = (ProcessMonitorContext)item.Tag;
 
-                    if(v1 != null && v1.history != null)
+                    if ( v1 != null && v1.history != null )
                         v1.history.Running = false;
 
                     LVMonitorDetail.Items.RemoveAt(item.Index);
@@ -624,7 +626,7 @@ namespace PerfMonitor
 
                 var item = LVMonitorDetail.FocusedItem;
                 var ctx = (ProcessMonitorContext)item.Tag;
-                if ( ctx != null)
+                if ( ctx != null )
                 {
                     ctx.history!.Marker = editedText;
                     _historyController.Write();
