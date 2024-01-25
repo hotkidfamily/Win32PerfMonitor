@@ -60,9 +60,9 @@ namespace PerfMonitor
             if (!_first)
             {
                 PerfRoot.PDH_FMT_COUNTERVALUE fmtValue;
-                PerfRoot.PDH_FMT fmt = PerfRoot.PDH_FMT.PDH_FMT_DOUBLE;
+                PerfRoot.PDH_FMT fmt = PerfRoot.PDH_FMT.PDH_FMT_LARGE;
                 PInvoke.PdhCalculateCounterFromRawValue(_hCounter, fmt, rawData, _lastData, out fmtValue);
-                cpu = fmtValue.Anonymous.doubleValue;
+                cpu = fmtValue.Anonymous.largeValue;
             }
             else { _first = false; }
 

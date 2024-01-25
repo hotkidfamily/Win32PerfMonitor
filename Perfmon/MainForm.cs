@@ -547,7 +547,6 @@ namespace PerfMonitor
                     mf.Location = location;
                     mf.ShowDialog();
                     DialogResult dr = mf.ShowResult();
-                    /*DialogResult dr = MessageBox.Show("确定要删除？","确认", MessageBoxButtons.OKCancel);*/
                     if (dr == DialogResult.OK )
                     {
                         v.Stop();

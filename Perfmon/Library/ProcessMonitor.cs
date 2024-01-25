@@ -93,7 +93,7 @@ namespace PerfMonitor
 
         private readonly UpdateMonitorStatusDelegate? _updateMonitorStatus;
 
-        private TraceEventSession ?_netTraceSession = null;
+        private TraceEventSession ?_traceSession = null;
         private readonly NetspeedTrace _netspeedDetail = new();
         private readonly NetspeedTrace _netspeedDetailOld = new();
         private readonly string _desc = "invalid process desc";
@@ -244,53 +244,54 @@ namespace PerfMonitor
             var processId = _pid;
             _netspeedDetail.send = 0;
             _netspeedDetail.received = 0;
-
-            TraceEventSession session = new("Perfmon_KernelAndClrEventsSession@" + _pid, TraceEventSessionOptions.NoPerProcessorBuffering | TraceEventSessionOptions.Create)
-            {
-                StopOnDispose = true
-            };
-            session.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP);
-
-            session.Source.Kernel.TcpIpRecv += data =>
-            {
-                if (data.ProcessID == processId)
-                {
-                    _netspeedDetail.received += data.size;
-                }
-            };
             
-            session.Source.Kernel.TcpIpSend += data =>
+            var sessionName = $"Perfmon_KernelAndClrEventsSession-{Guid.NewGuid()}-{_pid}";
+            using ( _traceSession = new(sessionName, TraceEventSessionOptions.Create) )
             {
-                if (data.ProcessID == processId)
-                {
-                    _netspeedDetail.send += data.size;
-                }
-            };
+                _traceSession.EnableKernelProvider(KernelTraceEventParser.Keywords.NetworkTCPIP);
 
-            session.Source.Kernel.UdpIpRecv += data =>
-            {
-                if (data.ProcessID == processId)
+                _traceSession.Source.Kernel.TcpIpRecv += data =>
                 {
-                    _netspeedDetail.received += data.size;
-                }
-            };
+                    if ( data.ProcessID == processId )
+                    {
+                        _netspeedDetail.received += data.size;
+                    }
+                };
 
-            session.Source.Kernel.UdpIpSend += data =>
-            {
-                if (data.ProcessID == processId)
+                _traceSession.Source.Kernel.TcpIpSend += data =>
                 {
-                    _netspeedDetail.send += data.size;
-                }
-            };
+                    if ( data.ProcessID == processId )
+                    {
+                        _netspeedDetail.send += data.size;
+                    }
+                };
 
-            session.Source.Process();
-            _netTraceSession = session;
+                _traceSession.Source.Kernel.UdpIpRecv += data =>
+                {
+                    if ( data.ProcessID == processId )
+                    {
+                        _netspeedDetail.received += data.size;
+                    }
+                };
+
+                _traceSession.Source.Kernel.UdpIpSend += data =>
+                {
+                    if ( data.ProcessID == processId )
+                    {
+                        _netspeedDetail.send += data.size;
+                    }
+                };
+
+                _traceSession.Source.Process();
+            }
         }
 
         public void Dispose()
         {
             _endTask = true;
-            _netTraceSession?.Dispose();
+            _traceSession?.Stop(true);
+            _traceSession?.Dispose();
+            _traceSession = null;
             _task?.Wait();
         }
     }

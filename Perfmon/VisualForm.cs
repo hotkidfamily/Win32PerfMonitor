@@ -89,14 +89,14 @@ namespace PerfMonitor
             formsPlotLink.Plot.ManualDataArea(padding);
             _uplinkLogger = formsPlotLink.Plot.AddDataLogger();
             _uplinkLogger.ViewSlide(width: 200);
-            _uplinkLogger.Label = "Up";
+            _uplinkLogger.Label = "up";
             _downlinkLogger = formsPlotLink.Plot.AddDataLogger();
             _downlinkLogger.ViewSlide(width: 200);
-            _downlinkLogger.Label = "Down";
+            _downlinkLogger.Label = "down";
 
 
             formsPlotCpuPerf.Name = TAB_HEADER_SYSTEM;
-            formsPlotCpuPerf.Plot.YLabel("System CPU (%)");
+            formsPlotCpuPerf.Plot.YLabel("CPU (%)(Perf Counter)");
             formsPlotCpuPerf.Plot.YAxis.SetBoundary(-5, 200);
             formsPlotCpuPerf.Plot.XAxis.SetBoundary(0);
             formsPlotCpuPerf.Plot.Legend().Location = Alignment.UpperRight;
