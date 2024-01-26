@@ -195,11 +195,11 @@ namespace PerfMonitor
 
         private void BtnSlide_Click(object sender, EventArgs e)
         {
-            _procLogger?.ViewSlide();
-            _procPerfLogger?.ViewSlide();
-            _memLogger?.ViewSlide();
-            _uplinkLogger.ViewSlide();
-            _downlinkLogger?.ViewSlide();
+            _procLogger?.ViewSlide(200);
+            _procPerfLogger?.ViewSlide(200);
+            _memLogger?.ViewSlide(200);
+            _uplinkLogger.ViewSlide(200);
+            _downlinkLogger?.ViewSlide(200);
             _sysLogger.ViewSlide();
             formsPlotProcCPU.Refresh();
             formsPlotProcMem.Refresh();
