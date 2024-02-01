@@ -1,4 +1,6 @@
 ﻿using CsvHelper;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.Logging;
 using PerfMonitor.Library;
 using PerfMonitor.Properties;
 using System.Diagnostics;
@@ -15,6 +17,7 @@ namespace PerfMonitor
         private static readonly List<RunStatusItem> _monitorResult = new();
         private readonly HistoryController _historyController;
         private ScottPlot.Plottable.DataStreamer  _cpuStreamer = default!;
+        private bool _close_when_exception = false;
 
         internal enum MonitorStatus : uint
         {
@@ -29,19 +32,18 @@ namespace PerfMonitor
             public int LiveVideIndex = 0;
             public CsvWriter? ResWriter;
             public string? ResPath;
-            public Thread? VisualThread;
+            public Form? _visualForm;
             public MonitorStatus MntStatus;
-            public HistoryItem? history;
+            public HistoryContext? history;
             public bool IsDisposed = false;
+            public uint PID = 0;
 
             public void Dispose ()
             {
                 IsDisposed = true;
-                Monitor?.Dispose();
-                ResWriter?.Dispose();
-                Monitor = null;
-                ResWriter = null;
+                Stop();
                 MntStatus = MonitorStatus.MonitorStatusRemoved;
+                _visualForm?.Close();
             }
 
             public void Stop ()
@@ -50,6 +52,13 @@ namespace PerfMonitor
                 ResWriter?.Dispose();
                 Monitor = null;
                 ResWriter = null;
+
+                if ( history != null )
+                {
+                    history.Running = false;
+                    history.End = DateTime.Now;
+                }
+
                 MntStatus = MonitorStatus.MonitorStatusStopped;
             }
 
@@ -61,9 +70,9 @@ namespace PerfMonitor
 
         private readonly Dictionary<uint, ProcessMonitorContext> _monitorManager = new();
 
-        private readonly string[] _colHeaders = new string[] { "测试内容", "PID", "进程名", "CPU", "虚拟内存", "物理内存", "总内存", "上行", "下行", "流量", "运行时间", "状态", };
-        private static readonly string[] _colDefaultValues = new string[] { "0", "0", "Attaching Process", "0", "0", "0", "0", "0", "0", "0", "0 s", "0" };
-        private static readonly int[] _colSize = new int[] { 150, 80, 100, 80, 100, 100, 100, 100, 100, 100, 120, 100 };
+        private readonly string[] _colHeaders = new string[] { "测试内容", "PID", "进程名", "运行时间", "CPU", "虚拟内存", "物理内存", "下行", "上行", "下行流量", "上行流量", "状态", };
+        private static readonly string[] _colDefaultValues = new string[] { "0", "0", "Attaching Process", "0 s", "0", "0", "0", "0", "0", "0", "0", "0" };
+        private static readonly int[] _colSize = new int[] { 150, 80, 100, 80, 100, 100, 100, 100, 100, 100, 100, 100 };
 
         private static readonly Process _proc = Process.GetCurrentProcess();
 
@@ -129,6 +138,8 @@ namespace PerfMonitor
             }
         }
 
+        public bool Close_when_exception { get => _close_when_exception; set => _close_when_exception = value; }
+
         public MainForm ()
         {
             InitializeComponent();
@@ -152,13 +163,14 @@ namespace PerfMonitor
             PlotSysCpuUsage.Configuration.RightClickDragZoom = false;
             PlotSysCpuUsage.Configuration.MiddleClickDragZoom = false;
             PlotSysCpuUsage.Configuration.LeftClickDragPan = false;
+            PlotSysCpuUsage.Configuration.ScrollWheelZoom = false;
             ScottPlot.PixelPadding padding = new(50, 4, 4, 2);
             PlotSysCpuUsage.Plot.ManualDataArea(padding);
             _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
             _cpuStreamer.LineWidth = 1;
             _cpuStreamer.ViewScrollLeft();
             PlotSysCpuUsage.Refresh();
-
+            CenterToScreen();
         }
 
         private void BtnShotProcess_MouseDown (object sender, MouseEventArgs e)
@@ -378,6 +390,7 @@ namespace PerfMonitor
                 var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 ProcessMonitorContext ctx = new()
                 {
+                    PID = pid,
                     Monitor = monitor,
                     ResWriter = csv,
                     ResPath = resPath,
@@ -397,20 +410,40 @@ namespace PerfMonitor
                 LVMonitorDetail.EndUpdate();
 
                 _monitorManager.Add(pid, ctx);
-                var his = _historyController.AddItem(pid, resPath, "无说明...");
+                var his = _historyController.AddItem(pid, name, resPath, "请添加说明...");
                 ctx.history = his;
             }
         }
 
         private void MainForm_FormClosing (object sender, FormClosingEventArgs e)
         {
-            foreach ( var it in _monitorManager )
+            if(_monitorManager.Count != 0 )
             {
-                it.Value.Dispose();
-            }
-            _monitorManager.Clear();
+                var dr = DialogResult.OK;
 
-            _proc.Dispose();
+                if ( !Close_when_exception )
+                {
+                    CustomMessageBox mf = new(this, "确认关闭？","确认", MessageBoxButtons.OKCancel);
+                    mf.ShowDialog();
+                    dr = mf.ShowResult();
+                }
+               
+                if ( dr == DialogResult.Cancel )
+                {
+                    e.Cancel = true;
+                }
+                else
+                {
+                    foreach ( var it in _monitorManager )
+                    {
+                        it.Value.Dispose();
+                    }
+                    _monitorManager.Clear();
+
+                    _proc.Dispose();
+                    _historyController.Write();
+                }
+            }
         }
 
         private void BtnOpenFloder_Click (object sender, EventArgs e)
@@ -438,23 +471,41 @@ namespace PerfMonitor
                     string path = it.ResPath ?? "";
                     if (
                         path != null
-                        && (it.VisualThread == null) // fix: already running form
                         && (it.LiveVideIndex == info.Item.Index) // fix: a monitor recapture after removed, then item be double cliked
                         )
                     {
-                        var helpThread = new Thread(new ThreadStart(() =>
+                        if(it._visualForm == null )
                         {
                             string desc = it.Monitor?.Descriptor() ?? "invalid";
                             var visual = new VisualForm(path, desc);
-                            visual.FormClosed += (s, e) =>
-                            {
-                                it.VisualThread = null;
-                            };
-                            visual.ShowDialog();
-                        }));
-                        helpThread.SetApartmentState(ApartmentState.STA);
-                        helpThread.Start();
-                        it.VisualThread = helpThread;
+                            visual.FormClosed += Visual_FormClosed;
+                            visual.Tag = it;
+                            visual.Show();
+                            visual.Location = Location + new Size(50, 50);
+                            it._visualForm = visual;
+                        }
+                        else
+                        {
+                            it._visualForm.Location = Location + new Size(50,50);
+                            it._visualForm.Focus();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Visual_FormClosed (object? sender, FormClosedEventArgs e)
+        {
+            var form = sender as VisualForm;
+            ProcessMonitorContext? b = form?.Tag as ProcessMonitorContext?? null;
+            lock(_monitorManager)
+            {
+                if ( b != null )
+                {
+                    uint pid = b.PID;
+                    if ( _monitorManager.ContainsKey(pid) )
+                    {
+                        b._visualForm = null;
                     }
                 }
             }
@@ -540,12 +591,7 @@ namespace PerfMonitor
                 var v = _monitorManager[pid];
                 if ( !v.IsStop() )
                 {
-                    Point loc = this.Location;
-                    Size sz = this.Size;
-                    Point location = new Point(loc.X + sz.Width /2 , loc.Y + sz.Height/2);
-                    CustomMessageBox mf = new(this, "确定要删除？","确认", location, MessageBoxButtons.OKCancel);
-                    location = new Point(loc.X + (sz.Width - mf.Size.Width) / 2, loc.Y + (sz.Height - mf.Size.Height) / 2);
-                    mf.Location = location;
+                    CustomMessageBox mf = new(this, "确定要删除？","确认", MessageBoxButtons.OKCancel);
                     mf.ShowDialog();
                     DialogResult dr = mf.ShowResult();
                     if ( dr == DialogResult.OK )
@@ -561,10 +607,6 @@ namespace PerfMonitor
                     v.Dispose();
                     _monitorManager.Remove(pid);
                     var v1 = (ProcessMonitorContext)item.Tag;
-
-                    if ( v1 != null && v1.history != null )
-                        v1.history.Running = false;
-
                     LVMonitorDetail.Items.RemoveAt(item.Index);
                     for ( int i = 0; i < LVMonitorDetail.Items.Count; i++ )
                     {

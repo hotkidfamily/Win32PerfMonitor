@@ -4,28 +4,40 @@ using System.Text.Json.Serialization;
 
 namespace PerfMonitor.Library
 {
-    internal class HistoryItem
+    internal class HistoryContext
     {
         private uint pid;
         private string marker = string.Empty;
-        private string date = string.Empty;
+        private string name = string.Empty;
+        private DateTime beginTime = default;
+        private DateTime endTime = default;
         private string resPath = string.Empty;
+        private Form ? _visualForm;
 
         [JsonPropertyName("Pid")]
         public uint Pid { get => pid; set => pid = value; }
         [JsonPropertyName("Marker")]
         public string Marker { get => marker; set => marker = value; }
-        [JsonPropertyName("Date")]
-        public string Date { get => date; set => date = value; }
+        [JsonPropertyName("Begin")]
+        public DateTime Begin { get => beginTime; set => beginTime = value; }
         [JsonPropertyName("ResPath")]
         public string ResPath { get => resPath; set => resPath = value; }
+        [JsonIgnore]
+        public Form? VisualForm { get => _visualForm; set => _visualForm = value; }
 
+        [JsonPropertyName("End")]
+        public DateTime End { get => endTime; set => endTime = value; }
+
+        [JsonPropertyName("Name")]
+        public string Name { get => name; set => name = value; }
+
+        [JsonIgnore]
         public bool Running = false;
 
         public string[] Info ()
         {
             return new string[] {
-                $"{Marker}", $"{Pid}", $"{Date}", $"{ResPath}"
+                $"{Marker}", $"{Pid}", $"{Name}", $"{Begin}", $"{(End - Begin).ToString("hh\\:mm\\:ss")}", $"{ResPath}"
             };
         }
     }
@@ -34,14 +46,14 @@ namespace PerfMonitor.Library
     {
         private readonly string version = "1.0";
         private string machine = string.Empty;
-        private List<HistoryItem> history = new();
+        private List<HistoryContext> history = new();
 
         [JsonPropertyName("Version")]
         public string Version { get => version; }
         [JsonPropertyName("Machine")]
         public string Machine { get => machine; set => machine = value; }
         [JsonPropertyName("History")]
-        public List<HistoryItem> History { get => history; set => history = value; }
+        public List<HistoryContext> History { get => history; set => history = value; }
 
         private string _path = string.Empty;
 
@@ -53,14 +65,16 @@ namespace PerfMonitor.Library
             _path = path;
         }
 
-        public HistoryItem AddItem (uint pid, string respath, string marker)
+        public HistoryContext AddItem (uint pid, string name, string respath, string marker)
         {
-            var item = new HistoryItem()
+            var item = new HistoryContext()
             {
                 Pid = pid,
                 ResPath = respath,
+                Name = name,
                 Marker = marker,
-                Date = $"{DateTime.Now:yyyy.MMdd.HHmm.ss}",
+                Begin = DateTime.Now,
+                End = DateTime.Now,
                 Running = true,
             };
             History.Add(item);
@@ -68,7 +82,8 @@ namespace PerfMonitor.Library
             return item;
         }
 
-        public void RemoveItem (HistoryItem item)
+
+        public void RemoveItem (HistoryContext item)
         {
             History.Remove(item);
             Write();

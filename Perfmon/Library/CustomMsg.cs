@@ -9,7 +9,7 @@ namespace PerfMonitor.Library
 
         public DialogResult ShowResult() { return btnid == 1 ? DialogResult.OK : DialogResult.Cancel; }
 
-        public CustomMessageBox (Form parent, string message, string title, Point location, MessageBoxButtons buttons)
+        public CustomMessageBox (Form parent, string message, string title,  MessageBoxButtons buttons)
         {
             // 设置窗体的属性
             Text = title;
@@ -85,6 +85,11 @@ namespace PerfMonitor.Library
 
             // 设置窗体的位置
             StartPosition = FormStartPosition.Manual;
+
+            Point loc = parent.Location;
+            Size sz = parent.Size;
+            Point location = new Point(loc.X + sz.Width /2 , loc.Y + sz.Height/2);
+            location = new Point(loc.X + (sz.Width - Size.Width) / 2, loc.Y + (sz.Height - Size.Height) / 2);
             Location = location;
         }
 

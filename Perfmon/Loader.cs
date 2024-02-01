@@ -15,25 +15,31 @@ namespace PerfMonitor
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 
             _mainForm = new();
-            _mainForm.ShowDialog();
+            Application.Run(_mainForm);
         }
 
         private static void Application_ThreadException (object sender, System.Threading.ThreadExceptionEventArgs e)
         {
+            if ( _mainForm != null )
+            {
+                _mainForm.Close_when_exception = true;
+            }
             var dr = handle();
             if ( dr == DialogResult.OK )
             {
-                _mainForm?.Close();
                 Application.Restart();
             }
         }
 
         private static void CurrentDomain_UnhandledException (object sender, UnhandledExceptionEventArgs e)
         {
+            if ( _mainForm != null )
+            {
+                _mainForm.Close_when_exception = true;
+            }
             var dr = handle();
             if ( dr == DialogResult.OK )
             {
-                _mainForm?.Close();
                 Application.Restart();
             }
         }
@@ -45,13 +51,7 @@ namespace PerfMonitor
                 return DialogResult.Cancel;
             }
 
-            Point loc = _mainForm.Location;
-            Size sz = _mainForm.Size;
-            Point location = new Point(loc.X + sz.Width /2 , loc.Y + sz.Height/2);
-
-            CustomMessageBox mf = new(_mainForm, "发生异常，要重启嘛？","确认", location, MessageBoxButtons.OKCancel);
-            location = new Point(loc.X + (sz.Width - mf.Size.Width) / 2, loc.Y + (sz.Height - mf.Size.Height) / 2);
-            mf.Location = location;
+            CustomMessageBox mf = new(_mainForm, "发生异常，要重启嘛？","确认", MessageBoxButtons.OKCancel);
             mf.ShowDialog();
             DialogResult dr = mf.ShowResult();
             return dr;

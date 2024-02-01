@@ -13,10 +13,10 @@ namespace PerfMonitor
         private double cpu = 0;
         private double vMem = 0;
         private double phyMem = 0;
-        private double totalMem = 0;
         private double downLink = 0;
         private double upLink = 0;
-        private double totalLinkFlow = 0;
+        private double totalUpLink = 0;
+        private double totalDownLink = 0;
         private long excuteSeconds = 0;
         private string excuteStatus = "no exist";
         private double sysCpu = 0;
@@ -27,10 +27,10 @@ namespace PerfMonitor
         public double Cpu { get => cpu; set => cpu = value; }
         public double VMem { get => vMem; set => vMem = value; }
         public double PhyMem { get => phyMem; set => phyMem = value; }
-        public double TotalMem { get => totalMem; set => totalMem = value; }
         public double DownLink { get => downLink; set => downLink = value; }
         public double UpLink { get => upLink; set => upLink = value; }
-        public double TotalLinkFlow { get => totalLinkFlow; set => totalLinkFlow = value; }
+        public double TotalUpLink { get => totalUpLink; set => totalUpLink = value; }
+        public double TotalDownLink { get => totalDownLink; set => totalDownLink = value; }
         public long ExcuteSeconds { get => excuteSeconds; set => excuteSeconds = value; }
         public string ExcuteStatus { get => excuteStatus; set => excuteStatus = value; }
         public double SysCpu { get => sysCpu; set => sysCpu = value; }
@@ -40,7 +40,8 @@ namespace PerfMonitor
         {
             string uposfix = " Kbps";
             string dposfix = " Kbps";
-            double total = TotalLinkFlow / 1024.0f;
+            double totalu = TotalUpLink / 1024.0f;
+            double totald = TotalDownLink / 1024.0f;
             double up = UpLink;
             double down = DownLink;
 
@@ -59,14 +60,14 @@ namespace PerfMonitor
             return new string[] {
                 $"{Pid}",
                 ProcName,
+                $"{TimeSpan.FromSeconds(ExcuteSeconds)} s",
                 $"{Cpu :F2}%",
                 $"{VMem/1024 :F2} GB",
                 $"{PhyMem :F2} MB",
-                $"{TotalMem/1024 :F2} GB",
-                $"{up :F2}{uposfix}",
                 $"{down :F2}{dposfix}",
-                $"{total :F2} MB",
-                $"{TimeSpan.FromSeconds(ExcuteSeconds)} s",
+                $"{up :F2}{uposfix}",
+                $"{totald :F2} MB",
+                $"{totalu :F2} MB",
                 $"{ExcuteStatus}",
                 $"{sysCpu :F2}%",
                 $"{cpuPerf :F2}%"
@@ -201,11 +202,10 @@ namespace PerfMonitor
                         {
                             _process.Refresh();
                         }
-                        catch ( Exception e ) { }
+                        catch ( Exception e ) { var _ = e; }
                         
                         _onceRes.VMem = _process.VirtualMemorySize64 / 1048576.0f;
                         _onceRes.PhyMem = _process.WorkingSet64 / 1048576.0f;
-                        _onceRes.TotalMem = _onceRes.VMem + _onceRes.PhyMem;
 
                         double nowProcessorTime = _process.TotalProcessorTime.TotalMilliseconds;
                         long nowTicks = sw.ElapsedMilliseconds;
@@ -223,7 +223,8 @@ namespace PerfMonitor
 
                             _onceRes.UpLink = (netspeedTracer.send - _netspeedDetailOld.send) * 8 / 1024.0f;
                             _onceRes.DownLink = (netspeedTracer.received - _netspeedDetailOld.received) * 8 / 1024.0f;
-                            _onceRes.TotalLinkFlow = (netspeedTracer.send + _netspeedDetailOld.received) / 1024.0f;
+                            _onceRes.TotalUpLink = netspeedTracer.send / 1024.0f;
+                            _onceRes.TotalDownLink = _netspeedDetailOld.received / 1024.0f;
 
                             _updateMonitorStatus?.Invoke(ref _onceRes);
                         }

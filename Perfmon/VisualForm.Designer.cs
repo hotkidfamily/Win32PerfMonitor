@@ -29,61 +29,52 @@
         private void InitializeComponent ()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VisualForm));
-            formsPlotProcCPU = new ScottPlot.FormsPlot();
-            formsPlotProcMem = new ScottPlot.FormsPlot();
-            formsPlotLink = new ScottPlot.FormsPlot();
-            formsPlotCpuPerf = new ScottPlot.FormsPlot();
+            PlotMem = new ScottPlot.FormsPlot();
+            PlotLink = new ScottPlot.FormsPlot();
+            PlotPerf = new ScottPlot.FormsPlot();
             tableLayoutPanel1 = new TableLayoutPanel();
+            PlotVMem = new ScottPlot.FormsPlot();
             BtnFull = new Button();
             BtnSlide = new Button();
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
-            // formsPlotProcCPU
+            // PlotMem
             // 
-            formsPlotProcCPU.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            formsPlotProcCPU.Location = new Point(4, 3);
-            formsPlotProcCPU.Margin = new Padding(4, 3, 4, 3);
-            formsPlotProcCPU.Name = "formsPlotProcCPU";
-            formsPlotProcCPU.Size = new Size(890, 187);
-            formsPlotProcCPU.TabIndex = 0;
+            PlotMem.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PlotMem.Location = new Point(4, 196);
+            PlotMem.Margin = new Padding(4, 3, 4, 3);
+            PlotMem.Name = "PlotMem";
+            PlotMem.Size = new Size(890, 187);
+            PlotMem.TabIndex = 1;
             // 
-            // formsPlotProcMem
+            // PlotLink
             // 
-            formsPlotProcMem.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            formsPlotProcMem.Location = new Point(4, 196);
-            formsPlotProcMem.Margin = new Padding(4, 3, 4, 3);
-            formsPlotProcMem.Name = "formsPlotProcMem";
-            formsPlotProcMem.Size = new Size(890, 187);
-            formsPlotProcMem.TabIndex = 1;
+            PlotLink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PlotLink.Location = new Point(4, 389);
+            PlotLink.Margin = new Padding(4, 3, 4, 3);
+            PlotLink.Name = "PlotLink";
+            PlotLink.Size = new Size(890, 187);
+            PlotLink.TabIndex = 2;
             // 
-            // formsPlotLink
+            // PlotPerf
             // 
-            formsPlotLink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            formsPlotLink.Location = new Point(4, 389);
-            formsPlotLink.Margin = new Padding(4, 3, 4, 3);
-            formsPlotLink.Name = "formsPlotLink";
-            formsPlotLink.Size = new Size(890, 187);
-            formsPlotLink.TabIndex = 2;
-            // 
-            // formsPlotCpuPerf
-            // 
-            formsPlotCpuPerf.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            formsPlotCpuPerf.Location = new Point(4, 582);
-            formsPlotCpuPerf.Margin = new Padding(4, 3, 4, 3);
-            formsPlotCpuPerf.Name = "formsPlotCpuPerf";
-            formsPlotCpuPerf.Size = new Size(890, 189);
-            formsPlotCpuPerf.TabIndex = 3;
+            PlotPerf.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PlotPerf.Location = new Point(4, 582);
+            PlotPerf.Margin = new Padding(4, 3, 4, 3);
+            PlotPerf.Name = "PlotPerf";
+            PlotPerf.Size = new Size(890, 189);
+            PlotPerf.TabIndex = 3;
             // 
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Controls.Add(formsPlotProcCPU, 0, 0);
-            tableLayoutPanel1.Controls.Add(formsPlotProcMem, 0, 1);
-            tableLayoutPanel1.Controls.Add(formsPlotLink, 0, 2);
-            tableLayoutPanel1.Controls.Add(formsPlotCpuPerf, 0, 3);
+            tableLayoutPanel1.Controls.Add(PlotMem, 0, 1);
+            tableLayoutPanel1.Controls.Add(PlotLink, 0, 2);
+            tableLayoutPanel1.Controls.Add(PlotPerf, 0, 3);
+            tableLayoutPanel1.Controls.Add(PlotVMem, 0, 0);
             tableLayoutPanel1.Location = new Point(12, 37);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 4;
@@ -93,6 +84,15 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
             tableLayoutPanel1.Size = new Size(898, 774);
             tableLayoutPanel1.TabIndex = 4;
+            // 
+            // PlotVMem
+            // 
+            PlotVMem.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PlotVMem.Location = new Point(4, 3);
+            PlotVMem.Margin = new Padding(4, 3, 4, 3);
+            PlotVMem.Name = "PlotVMem";
+            PlotVMem.Size = new Size(890, 187);
+            PlotVMem.TabIndex = 7;
             // 
             // BtnFull
             // 
@@ -135,13 +135,12 @@
         }
 
         #endregion
-
-        private ScottPlot.FormsPlot formsPlotProcCPU;
-        private ScottPlot.FormsPlot formsPlotProcMem;
-        private ScottPlot.FormsPlot formsPlotLink;
-        private ScottPlot.FormsPlot formsPlotCpuPerf;
+        private ScottPlot.FormsPlot PlotMem;
+        private ScottPlot.FormsPlot PlotLink;
+        private ScottPlot.FormsPlot PlotPerf;
         private TableLayoutPanel tableLayoutPanel1;
         private Button BtnFull;
         private Button BtnSlide;
+        private ScottPlot.FormsPlot PlotVMem;
     }
 }
