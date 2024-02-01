@@ -157,7 +157,7 @@ namespace PerfMonitor
                     if ( ctx.VisualForm == null )
                     {
                         string desc = $" - {ctx.Name}( {ctx.Pid} )( {ctx.Begin} )";
-                        var visual = new VisualForm(ctx.ResPath, desc);
+                        var visual = new VisualForm(ctx.ResPath, desc, ctx.Begin);
                         visual.Show();
                         visual.FormClosed += Visual_FormClosed;
                         visual.Location = Location + new Size(50, 50);

@@ -71,7 +71,7 @@ namespace PerfMonitor.Properties {
         }
         
         /// <summary>
-        ///   查找类似 v0.3.3 的本地化字符串。
+        ///   查找类似 v0.3.4 的本地化字符串。
         /// </summary>
         internal static string AppVersion {
             get {

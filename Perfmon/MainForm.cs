@@ -477,7 +477,8 @@ namespace PerfMonitor
                         if(it._visualForm == null )
                         {
                             string desc = it.Monitor?.Descriptor() ?? "invalid";
-                            var visual = new VisualForm(path, desc);
+                            var bein = it.history!.Begin;
+                            var visual = new VisualForm(path, desc, bein);
                             visual.FormClosed += Visual_FormClosed;
                             visual.Tag = it;
                             visual.Show();

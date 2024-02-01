@@ -3,12 +3,15 @@ using CsvHelper.Configuration;
 using ScottPlot;
 using ScottPlot.Plottable;
 using System.Globalization;
+using System.Windows.Forms;
+using static ScottPlot.Plottable.PopulationPlot;
 
 namespace PerfMonitor
 {
     public partial class VisualForm : Form
     {
         private readonly string _csvPath;
+        private readonly DateTime _begin;
 
         private static readonly string TAB_HEADER_MEMORY = "Memory";
         private static readonly string TAB_HEADER_VMEMORY = "VMemory";
@@ -44,11 +47,12 @@ namespace PerfMonitor
             }
         }
 
-        public VisualForm(string path, string descriptor)
+        public VisualForm(string path, string descriptor, DateTime begin)
         {
+            _begin = begin;
+            _csvPath = path;
             InitializeComponent();
             ConstructTabControl();
-            _csvPath = path;
             _ = UpdateInfo();
             Text += descriptor;
         }
@@ -58,9 +62,11 @@ namespace PerfMonitor
             PixelPadding padding = new(80, 4, 18, 2);
             int rotation_angle = 60;
 
-            /*            _cpuLogger = plot.AddDataLogger();
-                        _cpuLogger.ViewSlide(200);*/
-
+            string datatimeLabels (double y)
+            {
+                DateTime day1 = _begin;
+                return day1.AddSeconds(y).ToString("HH:mm:ss");
+            }
 
             var plot = PlotVMem.Plot;
             PlotVMem.Name = TAB_HEADER_VMEMORY;
@@ -68,14 +74,14 @@ namespace PerfMonitor
             PlotVMem.Configuration.MiddleClickDragZoom = false;
             PlotVMem.Configuration.LeftClickDragPan = false;
             PlotVMem.Configuration.ScrollWheelZoom = false;
-            plot.YAxis.SetBoundary(-5);
-            plot.YAxis.TickLabelStyle(rotation: rotation_angle);
-            plot.XAxis.SetBoundary(0);
-            plot.XAxis.MajorGrid(true);
-            plot.XAxis.Ticks(true);
             plot.ManualDataArea(new(80, 4, 18, 2));
             plot.Margins(x: .05, y: .05);
             plot.YLabel("VMemory");
+            plot.YAxis.SetBoundary(-5);
+            plot.YAxis.TickLabelStyle(rotation: rotation_angle);
+            plot.XAxis.SetBoundary(0);
+            plot.XAxis.MinimumTickSpacing(5);
+            plot.XAxis.TickLabelFormat(datatimeLabels);
             _vmemLogger = plot.AddDataLogger();
             _vmemLogger.ViewSlide(200);
 
@@ -86,29 +92,33 @@ namespace PerfMonitor
             PlotMem.Configuration.MiddleClickDragZoom = false;
             PlotMem.Configuration.LeftClickDragPan = false;
             PlotMem.Configuration.ScrollWheelZoom = false;
-            plot.YAxis.TickLabelStyle(rotation: rotation_angle);
-            plot.YAxis.SetBoundary(-5);
             plot.ManualDataArea(new(80, 4, 18, 2));
             plot.Margins(x: .05, y: .05);
-            plot.XAxis.SetBoundary(0);
             plot.YLabel("Memory (MB)");
+            plot.YAxis.TickLabelStyle(rotation: rotation_angle);
+            plot.YAxis.SetBoundary(-5);
+            plot.XAxis.SetBoundary(0);
+            plot.XAxis.MinimumTickSpacing(5);
+            plot.XAxis.TickLabelFormat(datatimeLabels);
             _memLogger = plot.AddDataLogger();
             _memLogger.ViewSlide(200);
 
 
             plot = PlotLink.Plot;
             PlotLink.Name = TAB_HEADER_LINK;
-            plot.YLabel("Traffic (Kb/s)");
-            plot.YAxis.SetBoundary(-1000);
-            plot.YAxis.TickLabelStyle(rotation: rotation_angle);
-            plot.XAxis.SetBoundary(0);
-            plot.Legend().Location = Alignment.UpperRight;
             PlotLink.Configuration.RightClickDragZoom = false;
             PlotLink.Configuration.MiddleClickDragZoom = false;
             PlotLink.Configuration.LeftClickDragPan = false;
             PlotLink.Configuration.ScrollWheelZoom = false;
             plot.ManualDataArea(padding);
             plot.Margins(x: .05, y: .05);
+            plot.YLabel("Traffic (Kb/s)");
+            plot.YAxis.SetBoundary(-1000);
+            plot.YAxis.TickLabelStyle(rotation: rotation_angle);
+            plot.XAxis.SetBoundary(0);
+            plot.XAxis.MinimumTickSpacing(5);
+            plot.XAxis.TickLabelFormat(datatimeLabels);
+            plot.Legend().Location = Alignment.UpperRight;
             _uplinkLogger = plot.AddDataLogger();
             _uplinkLogger.ViewSlide(200);
             _uplinkLogger.Label = "up";
@@ -119,16 +129,18 @@ namespace PerfMonitor
 
             plot = PlotPerf.Plot;
             PlotPerf.Name = TAB_HEADER_SYSTEM;
-            plot.YLabel("CPU (%)(Perf Counter)");
-            plot.YAxis.SetBoundary(-5);
-            plot.XAxis.SetBoundary(0);
-            plot.Legend().Location = Alignment.UpperRight;
             PlotPerf.Configuration.RightClickDragZoom = false;
             PlotPerf.Configuration.MiddleClickDragZoom = false;
             PlotPerf.Configuration.LeftClickDragPan = false;
             PlotPerf.Configuration.ScrollWheelZoom = false;
             plot.ManualDataArea(padding);
             plot.Margins(x: .05, y: .05);
+            plot.YLabel("CPU (%)(Perf Counter)");
+            plot.YAxis.SetBoundary(-5);
+            plot.XAxis.SetBoundary(0);
+            plot.XAxis.MinimumTickSpacing(5);
+            plot.XAxis.TickLabelFormat(datatimeLabels);
+            plot.Legend().Location = Alignment.UpperRight;
             _sysLogger = plot.AddDataLogger();
             _sysLogger.ViewSlide(200);
             _sysLogger.Label = "sys";
