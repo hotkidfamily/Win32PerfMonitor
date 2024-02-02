@@ -144,7 +144,6 @@ namespace PerfMonitor
                 {
                     long lastMonitorTicks = 0;
                     double lastProcessorTime = 0;
-                    double cores = 100.0f / Environment.ProcessorCount;
                     NetspeedTrace netspeedTracer = new();
 
                     string strQuery = $"\\Process({_process.ProcessName})\\% Processor Time";
@@ -212,7 +211,7 @@ namespace PerfMonitor
                         if ( lastMonitorTicks != 0 && lastProcessorTime != 0 )
                         {
                             _onceRes.CpuPerf = cpuUsage?.NextValue() ?? 0;
-                            _onceRes.Cpu = Math.Round((nowProcessorTime - lastProcessorTime) * cores / (nowTicks - lastMonitorTicks), 2);
+                            _onceRes.Cpu = Math.Round((nowProcessorTime - lastProcessorTime) * 100.0f / Environment.ProcessorCount / (nowTicks - lastMonitorTicks), 2);
                             lastMonitorTicks = nowTicks;
                             lastProcessorTime = nowProcessorTime;
 

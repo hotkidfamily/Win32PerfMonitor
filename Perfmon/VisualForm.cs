@@ -12,6 +12,7 @@ namespace PerfMonitor
     {
         private readonly string _csvPath;
         private readonly DateTime _begin;
+        private readonly int SLIDE_VIEW_WIDTH = 200;
 
         private static readonly string TAB_HEADER_MEMORY = "Memory";
         private static readonly string TAB_HEADER_VMEMORY = "VMemory";
@@ -83,7 +84,6 @@ namespace PerfMonitor
             plot.XAxis.MinimumTickSpacing(5);
             plot.XAxis.TickLabelFormat(datatimeLabels);
             _vmemLogger = plot.AddDataLogger();
-            _vmemLogger.ViewSlide(200);
 
 
             plot = PlotMem.Plot;
@@ -101,7 +101,6 @@ namespace PerfMonitor
             plot.XAxis.MinimumTickSpacing(5);
             plot.XAxis.TickLabelFormat(datatimeLabels);
             _memLogger = plot.AddDataLogger();
-            _memLogger.ViewSlide(200);
 
 
             plot = PlotLink.Plot;
@@ -120,10 +119,8 @@ namespace PerfMonitor
             plot.XAxis.TickLabelFormat(datatimeLabels);
             plot.Legend().Location = Alignment.UpperRight;
             _uplinkLogger = plot.AddDataLogger();
-            _uplinkLogger.ViewSlide(200);
             _uplinkLogger.Label = "up";
             _downlinkLogger = plot.AddDataLogger();
-            _downlinkLogger.ViewSlide(200);
             _downlinkLogger.Label = "down";
 
 
@@ -142,20 +139,13 @@ namespace PerfMonitor
             plot.XAxis.TickLabelFormat(datatimeLabels);
             plot.Legend().Location = Alignment.UpperRight;
             _sysLogger = plot.AddDataLogger();
-            _sysLogger.ViewSlide(200);
             _sysLogger.Label = "sys";
             _cpuPerfLogger = plot.AddDataLogger();
-            _cpuPerfLogger.ViewSlide(200);
             _cpuPerfLogger.Label = "cur";
             _cpuLogger = plot.AddDataLogger();
-            _cpuLogger.ViewSlide(200);
             _cpuLogger.Label = "pro";
 
-
-            PlotMem.Refresh();
-            PlotVMem.Refresh();
-            PlotLink.Refresh();
-            PlotPerf.Refresh();
+            _Update_View(false);
         }
 
         async Task UpdateInfo()
@@ -226,15 +216,28 @@ namespace PerfMonitor
             _sysLogger?.Clear();
         }
 
-        private void BtnFull_Click(object sender, EventArgs e)
+        private void _Update_View(bool full)
         {
-            _cpuLogger?.ViewFull();
-            _memLogger?.ViewFull();
-            _vmemLogger?.ViewFull();
-            _uplinkLogger.ViewFull();
-            _downlinkLogger?.ViewFull();
-            _sysLogger?.ViewFull();
-            _cpuPerfLogger?.ViewFull();
+            if(full)
+            {
+                _cpuLogger?.ViewFull();
+                _memLogger?.ViewFull();
+                _vmemLogger?.ViewFull();
+                _uplinkLogger.ViewFull();
+                _downlinkLogger?.ViewFull();
+                _sysLogger?.ViewFull();
+                _cpuPerfLogger?.ViewFull();
+            }
+            else
+            {
+                _cpuLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+                _memLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+                _vmemLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+                _uplinkLogger.ViewSlide(SLIDE_VIEW_WIDTH);
+                _downlinkLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+                _sysLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+                _cpuPerfLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            }
 
             UpdateYAxisLimits();
 
@@ -244,22 +247,15 @@ namespace PerfMonitor
             PlotPerf.Refresh();
         }
 
+        private void BtnFull_Click(object sender, EventArgs e)
+        {
+            _Update_View(true);
+        }
+
+
         private void BtnSlide_Click(object sender, EventArgs e)
         {
-            _cpuLogger?.ViewSlide(200);
-            _memLogger?.ViewSlide(200);
-            _vmemLogger?.ViewSlide(200);
-            _uplinkLogger.ViewSlide(200);
-            _downlinkLogger?.ViewSlide(200);
-            _sysLogger?.ViewSlide(200);
-            _cpuPerfLogger?.ViewSlide(200);
-
-            UpdateYAxisLimits();
-
-            PlotMem.Refresh();
-            PlotVMem.Refresh();
-            PlotLink.Refresh();
-            PlotPerf.Refresh();
+            _Update_View(false);
         }
 
         private void UpdateYAxisLimits ()
@@ -270,7 +266,9 @@ namespace PerfMonitor
                 var diff = (yMax - yMin) / 20;
                 yMin -= diff;
                 yMax += diff;
-                PlotPerf.Plot.YAxis.Dims.SetAxis(yMin, yMax);
+                var v1 = PlotPerf.Plot.YAxis.Dims.Span;
+                if (v1 < yMax- yMin)
+                    PlotPerf.Plot.YAxis.Dims.SetAxis(yMin, yMax);
             }
             {
                 double yMin = Math.Min(_uplinkLogger.GetAxisLimits().YMin , _downlinkLogger.GetAxisLimits().YMin);
@@ -279,7 +277,9 @@ namespace PerfMonitor
                 yMin -= diff;
                 yMax += diff;
 
-                PlotLink.Plot.YAxis.Dims.SetAxis(yMin, yMax);
+                var v1 = PlotLink.Plot.YAxis.Dims.Span;
+                if ( v1 < yMax - yMin )
+                    PlotLink.Plot.YAxis.Dims.SetAxis(yMin, yMax);
             }
         }
     }
