@@ -26,7 +26,7 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        private void InitializeComponent ()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingForm));
             tabControl1 = new TabControl();
@@ -84,7 +84,7 @@
             tabPageMonitor.Location = new Point(4, 26);
             tabPageMonitor.Name = "tabPageMonitor";
             tabPageMonitor.Padding = new Padding(3);
-            tabPageMonitor.Size = new Size(768, 376);
+            tabPageMonitor.Size = new Size(768, 280);
             tabPageMonitor.TabIndex = 1;
             tabPageMonitor.Text = "Monitor";
             tabPageMonitor.UseVisualStyleBackColor = true;
@@ -95,8 +95,9 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 331);
             Controls.Add(tabControl1);
-            Icon = (Icon)resources.GetObject("$this.Icon");
+            Icon = (Icon) resources.GetObject("$this.Icon");
             Name = "SettingForm";
+            ShowInTaskbar = false;
             Text = "SettingForm";
             tabControl1.ResumeLayout(false);
             tabPageCommon.ResumeLayout(false);

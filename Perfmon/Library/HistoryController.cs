@@ -6,7 +6,7 @@ namespace PerfMonitor.Library
 {
     internal class HistoryContext
     {
-        private uint pid;
+        private int pid;
         private string marker = string.Empty;
         private string name = string.Empty;
         private DateTime beginTime = default;
@@ -15,7 +15,7 @@ namespace PerfMonitor.Library
         private Form ? _visualForm;
 
         [JsonPropertyName("Pid")]
-        public uint Pid { get => pid; set => pid = value; }
+        public int Pid { get => pid; set => pid = value; }
         [JsonPropertyName("Marker")]
         public string Marker { get => marker; set => marker = value; }
         [JsonPropertyName("Begin")]
@@ -65,7 +65,7 @@ namespace PerfMonitor.Library
             _path = path;
         }
 
-        public HistoryContext AddItem (uint pid, string name, string respath, string marker)
+        public HistoryContext AddItem (int pid, string name, string respath, string marker)
         {
             var item = new HistoryContext()
             {

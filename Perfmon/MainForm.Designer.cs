@@ -177,6 +177,7 @@
             textBoxPID.Size = new Size(100, 23);
             textBoxPID.TabIndex = 1;
             toolTip1.SetToolTip(textBoxPID, "输入PID");
+            textBoxPID.MouseClick += textBoxPID_Focus;
             textBoxPID.KeyPress += TextBoxPID_KeyPress;
             // 
             // label2

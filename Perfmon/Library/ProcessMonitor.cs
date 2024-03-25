@@ -8,7 +8,7 @@ namespace PerfMonitor
 
     internal class RunStatusItem
     {
-        private uint pid = 0;
+        private int pid = 0;
         private string procName = "undefined";
         private double cpu = 0;
         private double vMem = 0;
@@ -22,7 +22,7 @@ namespace PerfMonitor
         private double sysCpu = 0;
         private double cpuPerf = 0;
 
-        public uint Pid { get => pid; set => pid = value; }
+        public int Pid { get => pid; set => pid = value; }
         public string ProcName { get => procName; set => procName = value; }
         public double Cpu { get => cpu; set => cpu = value; }
         public double VMem { get => vMem; set => vMem = value; }
@@ -82,7 +82,7 @@ namespace PerfMonitor
 
     internal class ProcessMonitor : IDisposable
     {
-        private readonly uint _pid = 0;
+        private readonly int _pid = 0;
 
         private readonly int _interval = 1000;
         private bool _endTask = true;
@@ -113,7 +113,7 @@ namespace PerfMonitor
             return _desc;
         }
 
-        public ProcessMonitor(uint pid, int interval, UpdateMonitorStatusDelegate UpdateHandle) 
+        public ProcessMonitor(int pid, int interval, UpdateMonitorStatusDelegate UpdateHandle) 
         {
             _pid = pid;
             _interval = interval;
@@ -121,7 +121,7 @@ namespace PerfMonitor
             
             try
             {
-                _process = System.Diagnostics.Process.GetProcessById((int)pid);
+                _process = System.Diagnostics.Process.GetProcessById(pid);
             }
             catch (ArgumentException)
             {
@@ -142,8 +142,8 @@ namespace PerfMonitor
 
                 _task = new Task(() =>
                 {
-                    long lastMonitorTicks = 0;
-                    double lastProcessorTime = 0;
+                    long lastMonitorTicks = -1;
+                    double lastProcessorTime = -1;
                     NetspeedTrace netspeedTracer = new();
 
                     string strQuery = $"\\Process({_process.ProcessName})\\% Processor Time";
@@ -208,7 +208,7 @@ namespace PerfMonitor
 
                         double nowProcessorTime = _process.TotalProcessorTime.TotalMilliseconds;
                         long nowTicks = sw.ElapsedMilliseconds;
-                        if ( lastMonitorTicks != 0 && lastProcessorTime != 0 )
+                        if ( lastMonitorTicks != -1 && lastProcessorTime != -1 )
                         {
                             _onceRes.CpuPerf = cpuUsage?.NextValue() ?? 0;
                             _onceRes.Cpu = Math.Round((nowProcessorTime - lastProcessorTime) * 100.0f / Environment.ProcessorCount / (nowTicks - lastMonitorTicks), 2);
