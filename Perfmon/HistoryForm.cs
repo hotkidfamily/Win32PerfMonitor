@@ -132,6 +132,10 @@ namespace PerfMonitor
                 }
                 LVHistory.EndUpdate();
             }
+            else if(e.KeyCode == Keys.Escape )
+            {
+                HistoryForm_KeyDown(this, e);
+            }
         }
 
         private void FreshToolStripMenuItem_Click (object sender, EventArgs e)
@@ -180,6 +184,24 @@ namespace PerfMonitor
             if ( b != null )
             {
                 b.VisualForm = null;
+            }
+        }
+
+        private void HistoryForm_KeyDown (object sender, KeyEventArgs e)
+        {
+            if ( e.KeyCode == Keys.Escape )
+            {
+                var item = LVHistory.FocusedItem;
+                if ( item != null )
+                {
+                    var ctx = (HistoryContext)item.Tag;
+                    if ( ctx != null && !ctx.Running )
+                    {
+                        ctx.VisualForm?.Close();
+
+                    }
+                }
+                Close();
             }
         }
     }

@@ -110,6 +110,8 @@ namespace PerfMonitor
             IEqualityComparer<Process> ProcessCompare = new ProcessComparer<Process>();
             int seconds = 0;
 
+            int tick = 200;
+
             while ( !_exit )
             {
                 lock ( _ps_history )
@@ -123,7 +125,7 @@ namespace PerfMonitor
                     return ret == 0 ? a.Id - b.Id : ret;
                 });
 
-                labelProcess.Text = $"Total: {ps.Count}, {LVProcss.Items.Count}, {seconds++ / 10}";
+                labelProcess.Text = $"Total: {ps.Count}, {LVProcss.Items.Count}, {seconds++ / (1000/tick)}";
 
                 if ( _filter.Length > 0 )
                 {
@@ -215,13 +217,35 @@ namespace PerfMonitor
                     }
                 }
                 LVProcss.EndUpdate();
-                await Task.Delay(TimeSpan.FromMilliseconds(200));
+                await Task.Delay(TimeSpan.FromMilliseconds(tick));
             }
         }
 
         private void textBoxPidOrName_KeyUp (object sender, KeyEventArgs e)
         {
             Filter = textBoxPidOrName.Text;
+            if(e.KeyCode == Keys.Enter)
+            {
+                if(LVProcss.Items.Count > 0)
+                {
+                    var item = LVProcss.Items[0];
+                    if ( item != null )
+                    {
+                        var pro = item.Tag as Process;
+                        if ( pro != null )
+                        {
+                            Pid = pro.Id;
+                            _exit = true;
+                            Close();
+                        }
+                    }
+                }
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                _exit = true;
+                Close();
+            }
         }
     }
 }

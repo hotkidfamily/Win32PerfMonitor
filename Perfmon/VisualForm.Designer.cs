@@ -36,6 +36,7 @@
             PlotVMem = new ScottPlot.FormsPlot();
             BtnFull = new Button();
             BtnSlide = new Button();
+            btnHighQuality = new Button();
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -118,11 +119,24 @@
             BtnSlide.UseVisualStyleBackColor = true;
             BtnSlide.Click += BtnSlide_Click;
             // 
+            // btnHighQuality
+            // 
+            btnHighQuality.Anchor =  AnchorStyles.Top | AnchorStyles.Right;
+            btnHighQuality.Location = new Point(609, 8);
+            btnHighQuality.Margin = new Padding(2);
+            btnHighQuality.Name = "btnHighQuality";
+            btnHighQuality.Size = new Size(71, 24);
+            btnHighQuality.TabIndex = 7;
+            btnHighQuality.Text = "绘图性能";
+            btnHighQuality.UseVisualStyleBackColor = true;
+            btnHighQuality.Click += btnHighQuality_Click;
+            // 
             // VisualForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(922, 823);
+            Controls.Add(btnHighQuality);
             Controls.Add(BtnSlide);
             Controls.Add(BtnFull);
             Controls.Add(tableLayoutPanel1);
@@ -130,6 +144,7 @@
             MinimumSize = new Size(938, 795);
             Name = "VisualForm";
             Text = "VisualForm";
+            KeyDown += VisualForm_KeyDown;
             tableLayoutPanel1.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -138,9 +153,10 @@
         private ScottPlot.FormsPlot PlotMem;
         private ScottPlot.FormsPlot PlotLink;
         private ScottPlot.FormsPlot PlotPerf;
+        private ScottPlot.FormsPlot PlotVMem;
         private TableLayoutPanel tableLayoutPanel1;
         private Button BtnFull;
         private Button BtnSlide;
-        private ScottPlot.FormsPlot PlotVMem;
+        private Button btnHighQuality;
     }
 }

@@ -26,11 +26,9 @@ namespace PerfMonitor
         private DataLogger _uplinkLogger = default!;
         private DataLogger _downlinkLogger = default!;
 
-        private int _refresh_counter = 0;
-
         class RunStatusItemMap : ClassMap<RunStatusItem>
         {
-            public RunStatusItemMap()
+            public RunStatusItemMap ()
             {
                 Map(m => m.Pid).Name("Pid");
                 Map(m => m.Cpu).Name("Cpu");
@@ -48,7 +46,7 @@ namespace PerfMonitor
             }
         }
 
-        public VisualForm(string path, string descriptor, DateTime begin)
+        public VisualForm (string path, string descriptor, DateTime begin)
         {
             _begin = begin;
             _csvPath = path;
@@ -58,7 +56,7 @@ namespace PerfMonitor
             Text += descriptor;
         }
 
-        private void ConstructTabControl()
+        private void ConstructTabControl ()
         {
             PixelPadding padding = new(80, 4, 18, 2);
             int rotation_angle = 60;
@@ -148,9 +146,9 @@ namespace PerfMonitor
             _Update_View(false);
         }
 
-        async Task UpdateInfo()
+        async Task UpdateInfo ()
         {
-            if (!File.Exists(_csvPath))
+            if ( !File.Exists(_csvPath) )
             {
                 return;
             }
@@ -170,6 +168,7 @@ namespace PerfMonitor
             using var reader = new StreamReader(fs);
             using var csv = new CsvReader(reader, config);
             csv.Context.RegisterClassMap<RunStatusItemMap>();
+            int _refresh_counter = 0;
 
             while ( !IsDisposed )
             {
@@ -187,7 +186,7 @@ namespace PerfMonitor
                     _cpuPerfLogger.Add(_cpuPerfLogger.Count, records[i].CpuPerf);
                 }
 
-                if ( length > 0)
+                if ( length > 0 )
                 {
                     _refresh_counter = 0;
                 }
@@ -216,9 +215,9 @@ namespace PerfMonitor
             _sysLogger?.Clear();
         }
 
-        private void _Update_View(bool full)
+        private void _Update_View (bool full)
         {
-            if(full)
+            if ( full )
             {
                 _cpuLogger?.ViewFull();
                 _memLogger?.ViewFull();
@@ -247,13 +246,13 @@ namespace PerfMonitor
             PlotPerf.Refresh();
         }
 
-        private void BtnFull_Click(object sender, EventArgs e)
+        private void BtnFull_Click (object sender, EventArgs e)
         {
             _Update_View(true);
         }
 
 
-        private void BtnSlide_Click(object sender, EventArgs e)
+        private void BtnSlide_Click (object sender, EventArgs e)
         {
             _Update_View(false);
         }
@@ -267,7 +266,7 @@ namespace PerfMonitor
                 yMin -= diff;
                 yMax += diff;
                 var v1 = PlotPerf.Plot.YAxis.Dims.Span;
-                if (v1 < yMax- yMin)
+                if ( v1 < yMax - yMin )
                     PlotPerf.Plot.YAxis.Dims.SetAxis(yMin, yMax);
             }
             {
@@ -280,6 +279,28 @@ namespace PerfMonitor
                 var v1 = PlotLink.Plot.YAxis.Dims.Span;
                 if ( v1 < yMax - yMin )
                     PlotLink.Plot.YAxis.Dims.SetAxis(yMin, yMax);
+            }
+        }
+
+        private void btnHighQuality_Click (object sender, EventArgs e)
+        {
+            var quality = PlotMem.Configuration.Quality == ScottPlot.Control.QualityMode.Low ? ScottPlot.Control.QualityMode.High : ScottPlot.Control.QualityMode.Low;
+            PlotMem.Configuration.Quality = quality;
+            PlotLink.Configuration.Quality = quality;
+            PlotPerf.Configuration.Quality = quality;
+            PlotVMem.Configuration.Quality = quality;
+
+            PlotMem.Refresh();
+            PlotVMem.Refresh();
+            PlotLink.Refresh();
+            PlotPerf.Refresh();
+        }
+
+        private void VisualForm_KeyDown (object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Escape )
+            {
+                Close();
             }
         }
     }

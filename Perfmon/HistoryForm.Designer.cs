@@ -111,6 +111,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "HistoryForm";
+            KeyDown += HistoryForm_KeyDown;
             HistoryMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
         }
