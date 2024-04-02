@@ -120,11 +120,11 @@ namespace PerfMonitor
             _uplinkLogger = plot.AddDataLogger();
 
             plot = PlotDownlink.Plot;
-            PlotUpLink.Name = TAB_HEADER_DownLINK;
-            PlotUpLink.Configuration.RightClickDragZoom = false;
-            PlotUpLink.Configuration.MiddleClickDragZoom = false;
-            PlotUpLink.Configuration.LeftClickDragPan = false;
-            PlotUpLink.Configuration.ScrollWheelZoom = false;
+            PlotDownlink.Name = TAB_HEADER_DownLINK;
+            PlotDownlink.Configuration.RightClickDragZoom = false;
+            PlotDownlink.Configuration.MiddleClickDragZoom = false;
+            PlotDownlink.Configuration.LeftClickDragPan = false;
+            PlotDownlink.Configuration.ScrollWheelZoom = false;
             plot.ManualDataArea(padding);
             plot.Margins(x: .05, y: .05);
             plot.YLabel("Download (Kb/s)");
