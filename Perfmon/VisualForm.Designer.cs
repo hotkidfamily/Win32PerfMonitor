@@ -30,41 +30,42 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VisualForm));
             PlotMem = new ScottPlot.FormsPlot();
-            PlotLink = new ScottPlot.FormsPlot();
+            PlotUpLink = new ScottPlot.FormsPlot();
             PlotPerf = new ScottPlot.FormsPlot();
             tableLayoutPanel1 = new TableLayoutPanel();
             PlotVMem = new ScottPlot.FormsPlot();
             BtnFull = new Button();
             BtnSlide = new Button();
             btnHighQuality = new Button();
+            PlotDownlink = new ScottPlot.FormsPlot();
             tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
             // PlotMem
             // 
             PlotMem.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            PlotMem.Location = new Point(4, 196);
+            PlotMem.Location = new Point(4, 157);
             PlotMem.Margin = new Padding(4, 3, 4, 3);
             PlotMem.Name = "PlotMem";
-            PlotMem.Size = new Size(890, 187);
+            PlotMem.Size = new Size(890, 148);
             PlotMem.TabIndex = 1;
             // 
             // PlotLink
             // 
-            PlotLink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            PlotLink.Location = new Point(4, 389);
-            PlotLink.Margin = new Padding(4, 3, 4, 3);
-            PlotLink.Name = "PlotLink";
-            PlotLink.Size = new Size(890, 187);
-            PlotLink.TabIndex = 2;
+            PlotUpLink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PlotUpLink.Location = new Point(4, 311);
+            PlotUpLink.Margin = new Padding(4, 3, 4, 3);
+            PlotUpLink.Name = "PlotLink";
+            PlotUpLink.Size = new Size(890, 148);
+            PlotUpLink.TabIndex = 2;
             // 
             // PlotPerf
             // 
             PlotPerf.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            PlotPerf.Location = new Point(4, 582);
+            PlotPerf.Location = new Point(4, 619);
             PlotPerf.Margin = new Padding(4, 3, 4, 3);
             PlotPerf.Name = "PlotPerf";
-            PlotPerf.Size = new Size(890, 189);
+            PlotPerf.Size = new Size(890, 152);
             PlotPerf.TabIndex = 3;
             // 
             // tableLayoutPanel1
@@ -73,16 +74,18 @@
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(PlotMem, 0, 1);
-            tableLayoutPanel1.Controls.Add(PlotLink, 0, 2);
-            tableLayoutPanel1.Controls.Add(PlotPerf, 0, 3);
+            tableLayoutPanel1.Controls.Add(PlotUpLink, 0, 2);
             tableLayoutPanel1.Controls.Add(PlotVMem, 0, 0);
+            tableLayoutPanel1.Controls.Add(PlotPerf, 0, 4);
+            tableLayoutPanel1.Controls.Add(PlotDownlink, 0, 3);
             tableLayoutPanel1.Location = new Point(12, 37);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 4;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tableLayoutPanel1.RowCount = 5;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             tableLayoutPanel1.Size = new Size(898, 774);
             tableLayoutPanel1.TabIndex = 4;
             // 
@@ -92,7 +95,7 @@
             PlotVMem.Location = new Point(4, 3);
             PlotVMem.Margin = new Padding(4, 3, 4, 3);
             PlotVMem.Name = "PlotVMem";
-            PlotVMem.Size = new Size(890, 187);
+            PlotVMem.Size = new Size(890, 148);
             PlotVMem.TabIndex = 7;
             // 
             // BtnFull
@@ -131,6 +134,15 @@
             btnHighQuality.UseVisualStyleBackColor = true;
             btnHighQuality.Click += btnHighQuality_Click;
             // 
+            // PlotDownlink
+            // 
+            PlotDownlink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PlotDownlink.Location = new Point(4, 465);
+            PlotDownlink.Margin = new Padding(4, 3, 4, 3);
+            PlotDownlink.Name = "PlotDownlink";
+            PlotDownlink.Size = new Size(890, 148);
+            PlotDownlink.TabIndex = 8;
+            // 
             // VisualForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -151,12 +163,13 @@
 
         #endregion
         private ScottPlot.FormsPlot PlotMem;
-        private ScottPlot.FormsPlot PlotLink;
+        private ScottPlot.FormsPlot PlotUpLink;
         private ScottPlot.FormsPlot PlotPerf;
         private ScottPlot.FormsPlot PlotVMem;
         private TableLayoutPanel tableLayoutPanel1;
         private Button BtnFull;
         private Button BtnSlide;
         private Button btnHighQuality;
+        private ScottPlot.FormsPlot PlotDownlink;
     }
 }

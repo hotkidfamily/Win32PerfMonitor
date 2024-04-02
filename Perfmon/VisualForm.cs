@@ -16,7 +16,8 @@ namespace PerfMonitor
 
         private static readonly string TAB_HEADER_MEMORY = "Memory";
         private static readonly string TAB_HEADER_VMEMORY = "VMemory";
-        private static readonly string TAB_HEADER_LINK = "Link";
+        private static readonly string TAB_HEADER_LINK = "UpLink";
+        private static readonly string TAB_HEADER_DownLINK = "DownLink";
         private static readonly string TAB_HEADER_SYSTEM = "Performance Counter";
         private DataLogger _sysLogger = default!;
         private DataLogger _cpuLogger = default!;
@@ -101,15 +102,15 @@ namespace PerfMonitor
             _memLogger = plot.AddDataLogger();
 
 
-            plot = PlotLink.Plot;
-            PlotLink.Name = TAB_HEADER_LINK;
-            PlotLink.Configuration.RightClickDragZoom = false;
-            PlotLink.Configuration.MiddleClickDragZoom = false;
-            PlotLink.Configuration.LeftClickDragPan = false;
-            PlotLink.Configuration.ScrollWheelZoom = false;
+            plot = PlotUpLink.Plot;
+            PlotUpLink.Name = TAB_HEADER_LINK;
+            PlotUpLink.Configuration.RightClickDragZoom = false;
+            PlotUpLink.Configuration.MiddleClickDragZoom = false;
+            PlotUpLink.Configuration.LeftClickDragPan = false;
+            PlotUpLink.Configuration.ScrollWheelZoom = false;
             plot.ManualDataArea(padding);
             plot.Margins(x: .05, y: .05);
-            plot.YLabel("Traffic (Kb/s)");
+            plot.YLabel("Upload (Kb/s)");
             plot.YAxis.SetBoundary(-1000);
             plot.YAxis.TickLabelStyle(rotation: rotation_angle);
             plot.XAxis.SetBoundary(0);
@@ -117,9 +118,23 @@ namespace PerfMonitor
             plot.XAxis.TickLabelFormat(datatimeLabels);
             plot.Legend().Location = Alignment.UpperRight;
             _uplinkLogger = plot.AddDataLogger();
-            _uplinkLogger.Label = "up";
+
+            plot = PlotDownlink.Plot;
+            PlotUpLink.Name = TAB_HEADER_DownLINK;
+            PlotUpLink.Configuration.RightClickDragZoom = false;
+            PlotUpLink.Configuration.MiddleClickDragZoom = false;
+            PlotUpLink.Configuration.LeftClickDragPan = false;
+            PlotUpLink.Configuration.ScrollWheelZoom = false;
+            plot.ManualDataArea(padding);
+            plot.Margins(x: .05, y: .05);
+            plot.YLabel("Download (Kb/s)");
+            plot.YAxis.SetBoundary(-1000);
+            plot.YAxis.TickLabelStyle(rotation: rotation_angle);
+            plot.XAxis.SetBoundary(0);
+            plot.XAxis.MinimumTickSpacing(5);
+            plot.XAxis.TickLabelFormat(datatimeLabels);
+            plot.Legend().Location = Alignment.UpperRight;
             _downlinkLogger = plot.AddDataLogger();
-            _downlinkLogger.Label = "down";
 
 
             plot = PlotPerf.Plot;
@@ -199,7 +214,8 @@ namespace PerfMonitor
                 {
                     PlotMem.Refresh();
                     PlotVMem.Refresh();
-                    PlotLink.Refresh();
+                    PlotUpLink.Refresh();
+                    PlotDownlink.Refresh();
                     PlotPerf.Refresh();
                 }
 
@@ -242,7 +258,8 @@ namespace PerfMonitor
 
             PlotMem.Refresh();
             PlotVMem.Refresh();
-            PlotLink.Refresh();
+            PlotUpLink.Refresh();
+            PlotDownlink.Refresh();
             PlotPerf.Refresh();
         }
 
@@ -276,9 +293,9 @@ namespace PerfMonitor
                 yMin -= diff;
                 yMax += diff;
 
-                var v1 = PlotLink.Plot.YAxis.Dims.Span;
+                var v1 = PlotUpLink.Plot.YAxis.Dims.Span;
                 if ( v1 < yMax - yMin )
-                    PlotLink.Plot.YAxis.Dims.SetAxis(yMin, yMax);
+                    PlotUpLink.Plot.YAxis.Dims.SetAxis(yMin, yMax);
             }
         }
 
@@ -286,13 +303,15 @@ namespace PerfMonitor
         {
             var quality = PlotMem.Configuration.Quality == ScottPlot.Control.QualityMode.Low ? ScottPlot.Control.QualityMode.High : ScottPlot.Control.QualityMode.Low;
             PlotMem.Configuration.Quality = quality;
-            PlotLink.Configuration.Quality = quality;
+            PlotUpLink.Configuration.Quality = quality;
+            PlotDownlink.Configuration.Quality = quality;
             PlotPerf.Configuration.Quality = quality;
             PlotVMem.Configuration.Quality = quality;
 
             PlotMem.Refresh();
             PlotVMem.Refresh();
-            PlotLink.Refresh();
+            PlotUpLink.Refresh();
+            PlotDownlink.Refresh();
             PlotPerf.Refresh();
         }
 
