@@ -46,6 +46,7 @@
             LVProcss.FullRowSelect = true;
             LVProcss.GridLines = true;
             LVProcss.Location = new Point(12, 52);
+            LVProcss.MultiSelect = false;
             LVProcss.Name = "LVProcss";
             LVProcss.Size = new Size(776, 386);
             LVProcss.TabIndex = 1;

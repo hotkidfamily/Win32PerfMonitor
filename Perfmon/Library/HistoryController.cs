@@ -37,7 +37,7 @@ namespace PerfMonitor.Library
         public string[] Info ()
         {
             return new string[] {
-                $"{Marker}", $"{Pid}", $"{Name}", $"{Begin}", $"{(End - Begin).ToString("hh\\:mm\\:ss")}", $"{ResPath}"
+                $"{Marker}", $"{Pid}", $"{Name}", $"{Begin}", $"{(End - Begin).ToString("dd\\.hh\\:mm\\:ss")}", $"{ResPath}"
             };
         }
     }

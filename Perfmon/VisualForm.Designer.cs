@@ -34,11 +34,12 @@
             PlotPerf = new ScottPlot.FormsPlot();
             tableLayoutPanel1 = new TableLayoutPanel();
             PlotVMem = new ScottPlot.FormsPlot();
-            BtnFull = new Button();
-            BtnSlide = new Button();
-            btnHighQuality = new Button();
             PlotDownlink = new ScottPlot.FormsPlot();
+            RadioFull = new RadioButton();
+            RadioSlide = new RadioButton();
+            groupBox1 = new GroupBox();
             tableLayoutPanel1.SuspendLayout();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // PlotMem
@@ -50,12 +51,12 @@
             PlotMem.Size = new Size(890, 148);
             PlotMem.TabIndex = 1;
             // 
-            // PlotLink
+            // PlotUpLink
             // 
             PlotUpLink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PlotUpLink.Location = new Point(4, 311);
             PlotUpLink.Margin = new Padding(4, 3, 4, 3);
-            PlotUpLink.Name = "PlotLink";
+            PlotUpLink.Name = "PlotUpLink";
             PlotUpLink.Size = new Size(890, 148);
             PlotUpLink.TabIndex = 2;
             // 
@@ -98,42 +99,6 @@
             PlotVMem.Size = new Size(890, 148);
             PlotVMem.TabIndex = 7;
             // 
-            // BtnFull
-            // 
-            BtnFull.Anchor =  AnchorStyles.Top | AnchorStyles.Right;
-            BtnFull.Location = new Point(719, 8);
-            BtnFull.Margin = new Padding(2);
-            BtnFull.Name = "BtnFull";
-            BtnFull.Size = new Size(71, 24);
-            BtnFull.TabIndex = 5;
-            BtnFull.Text = "历史";
-            BtnFull.UseVisualStyleBackColor = true;
-            BtnFull.Click += BtnFull_Click;
-            // 
-            // BtnSlide
-            // 
-            BtnSlide.Anchor =  AnchorStyles.Top | AnchorStyles.Right;
-            BtnSlide.Location = new Point(818, 8);
-            BtnSlide.Margin = new Padding(2);
-            BtnSlide.Name = "BtnSlide";
-            BtnSlide.Size = new Size(71, 24);
-            BtnSlide.TabIndex = 6;
-            BtnSlide.Text = "实时";
-            BtnSlide.UseVisualStyleBackColor = true;
-            BtnSlide.Click += BtnSlide_Click;
-            // 
-            // btnHighQuality
-            // 
-            btnHighQuality.Anchor =  AnchorStyles.Top | AnchorStyles.Right;
-            btnHighQuality.Location = new Point(609, 8);
-            btnHighQuality.Margin = new Padding(2);
-            btnHighQuality.Name = "btnHighQuality";
-            btnHighQuality.Size = new Size(71, 24);
-            btnHighQuality.TabIndex = 7;
-            btnHighQuality.Text = "绘图性能";
-            btnHighQuality.UseVisualStyleBackColor = true;
-            btnHighQuality.Click += btnHighQuality_Click;
-            // 
             // PlotDownlink
             // 
             PlotDownlink.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -143,14 +108,47 @@
             PlotDownlink.Size = new Size(890, 148);
             PlotDownlink.TabIndex = 8;
             // 
+            // RadioFull
+            // 
+            RadioFull.AutoSize = true;
+            RadioFull.Location = new Point(6, 13);
+            RadioFull.Name = "RadioFull";
+            RadioFull.Size = new Size(50, 21);
+            RadioFull.TabIndex = 7;
+            RadioFull.Text = "趋势";
+            RadioFull.UseVisualStyleBackColor = true;
+            RadioFull.CheckedChanged += RadioFull_CheckedChanged;
+            // 
+            // RadioSlide
+            // 
+            RadioSlide.AutoSize = true;
+            RadioSlide.Checked = true;
+            RadioSlide.Location = new Point(62, 13);
+            RadioSlide.Name = "RadioSlide";
+            RadioSlide.Size = new Size(50, 21);
+            RadioSlide.TabIndex = 8;
+            RadioSlide.TabStop = true;
+            RadioSlide.Text = "实时";
+            RadioSlide.UseVisualStyleBackColor = true;
+            RadioSlide.CheckedChanged += RadioSlide_CheckedChanged;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(RadioFull);
+            groupBox1.Controls.Add(RadioSlide);
+            groupBox1.Location = new Point(795, 1);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(115, 40);
+            groupBox1.TabIndex = 9;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "图形";
+            // 
             // VisualForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(922, 823);
-            Controls.Add(btnHighQuality);
-            Controls.Add(BtnSlide);
-            Controls.Add(BtnFull);
+            Controls.Add(groupBox1);
             Controls.Add(tableLayoutPanel1);
             Icon = (Icon) resources.GetObject("$this.Icon");
             MinimumSize = new Size(938, 795);
@@ -158,6 +156,8 @@
             Text = "VisualForm";
             KeyDown += VisualForm_KeyDown;
             tableLayoutPanel1.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -167,9 +167,9 @@
         private ScottPlot.FormsPlot PlotPerf;
         private ScottPlot.FormsPlot PlotVMem;
         private TableLayoutPanel tableLayoutPanel1;
-        private Button BtnFull;
-        private Button BtnSlide;
-        private Button btnHighQuality;
         private ScottPlot.FormsPlot PlotDownlink;
+        private RadioButton RadioFull;
+        private RadioButton RadioSlide;
+        private GroupBox groupBox1;
     }
 }

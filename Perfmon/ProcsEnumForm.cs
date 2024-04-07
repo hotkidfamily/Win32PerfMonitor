@@ -129,7 +129,7 @@ namespace PerfMonitor
 
                 if ( _filter.Length > 0 )
                 {
-                    ps = ps.FindAll(e => e.ProcessName.ToLower().Contains(_filter) || e.Id.ToString().Contains(_filter) || (e.MainWindowTitle.Length > 0 && e.MainWindowTitle.ToLower().Contains(_filter)));
+                    ps = ps.FindAll(e => e.ProcessName.ToLower().Contains(_filter) || e.Id.ToString().Contains(_filter));
                 }
 
                 LVProcss.BeginUpdate();

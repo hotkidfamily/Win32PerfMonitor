@@ -65,7 +65,7 @@ namespace PerfMonitor
             string datatimeLabels (double y)
             {
                 DateTime day1 = _begin;
-                return day1.AddSeconds(y).ToString("HH:mm:ss");
+                return day1.AddSeconds(y).ToString("dd.HH:mm:ss");
             }
 
             var plot = PlotVMem.Plot;
@@ -74,6 +74,7 @@ namespace PerfMonitor
             PlotVMem.Configuration.MiddleClickDragZoom = false;
             PlotVMem.Configuration.LeftClickDragPan = false;
             PlotVMem.Configuration.ScrollWheelZoom = false;
+            PlotVMem.Configuration.Quality = ScottPlot.Control.QualityMode.Low;
             plot.ManualDataArea(new(80, 4, 18, 2));
             plot.Margins(x: .05, y: .05);
             plot.YLabel("VMemory");
@@ -82,7 +83,8 @@ namespace PerfMonitor
             plot.XAxis.SetBoundary(0);
             plot.XAxis.MinimumTickSpacing(5);
             plot.XAxis.TickLabelFormat(datatimeLabels);
-            _vmemLogger = plot.AddDataLogger();
+            plot.Legend().Location = Alignment.UpperRight;
+            _vmemLogger = plot.AddDataLogger(label: "VMem");
 
 
             plot = PlotMem.Plot;
@@ -91,6 +93,7 @@ namespace PerfMonitor
             PlotMem.Configuration.MiddleClickDragZoom = false;
             PlotMem.Configuration.LeftClickDragPan = false;
             PlotMem.Configuration.ScrollWheelZoom = false;
+            PlotMem.Configuration.Quality = ScottPlot.Control.QualityMode.Low;
             plot.ManualDataArea(new(80, 4, 18, 2));
             plot.Margins(x: .05, y: .05);
             plot.YLabel("Memory (MB)");
@@ -99,8 +102,8 @@ namespace PerfMonitor
             plot.XAxis.SetBoundary(0);
             plot.XAxis.MinimumTickSpacing(5);
             plot.XAxis.TickLabelFormat(datatimeLabels);
-            _memLogger = plot.AddDataLogger();
-
+            plot.Legend().Location = Alignment.UpperRight;
+            _memLogger = plot.AddDataLogger(label:"PhyMem");
 
             plot = PlotUpLink.Plot;
             PlotUpLink.Name = TAB_HEADER_LINK;
@@ -108,6 +111,7 @@ namespace PerfMonitor
             PlotUpLink.Configuration.MiddleClickDragZoom = false;
             PlotUpLink.Configuration.LeftClickDragPan = false;
             PlotUpLink.Configuration.ScrollWheelZoom = false;
+            PlotUpLink.Configuration.Quality = ScottPlot.Control.QualityMode.Low;
             plot.ManualDataArea(padding);
             plot.Margins(x: .05, y: .05);
             plot.YLabel("Upload (Kb/s)");
@@ -117,7 +121,8 @@ namespace PerfMonitor
             plot.XAxis.MinimumTickSpacing(5);
             plot.XAxis.TickLabelFormat(datatimeLabels);
             plot.Legend().Location = Alignment.UpperRight;
-            _uplinkLogger = plot.AddDataLogger();
+            _uplinkLogger = plot.AddDataLogger(label: "upload");
+
 
             plot = PlotDownlink.Plot;
             PlotDownlink.Name = TAB_HEADER_DownLINK;
@@ -125,6 +130,7 @@ namespace PerfMonitor
             PlotDownlink.Configuration.MiddleClickDragZoom = false;
             PlotDownlink.Configuration.LeftClickDragPan = false;
             PlotDownlink.Configuration.ScrollWheelZoom = false;
+            PlotDownlink.Configuration.Quality = ScottPlot.Control.QualityMode.Low;
             plot.ManualDataArea(padding);
             plot.Margins(x: .05, y: .05);
             plot.YLabel("Download (Kb/s)");
@@ -134,7 +140,7 @@ namespace PerfMonitor
             plot.XAxis.MinimumTickSpacing(5);
             plot.XAxis.TickLabelFormat(datatimeLabels);
             plot.Legend().Location = Alignment.UpperRight;
-            _downlinkLogger = plot.AddDataLogger();
+            _downlinkLogger = plot.AddDataLogger(label: "download");
 
 
             plot = PlotPerf.Plot;
@@ -143,26 +149,32 @@ namespace PerfMonitor
             PlotPerf.Configuration.MiddleClickDragZoom = false;
             PlotPerf.Configuration.LeftClickDragPan = false;
             PlotPerf.Configuration.ScrollWheelZoom = false;
+            PlotPerf.Configuration.Quality = ScottPlot.Control.QualityMode.Low;
             plot.ManualDataArea(padding);
             plot.Margins(x: .05, y: .05);
-            plot.YLabel("CPU (%)(Perf Counter)");
+            plot.YLabel("CPU Usage");
             plot.YAxis.SetBoundary(-5);
             plot.XAxis.SetBoundary(0);
             plot.XAxis.MinimumTickSpacing(5);
             plot.XAxis.TickLabelFormat(datatimeLabels);
             plot.Legend().Location = Alignment.UpperRight;
-            _sysLogger = plot.AddDataLogger();
-            _sysLogger.Label = "sys";
-            _cpuPerfLogger = plot.AddDataLogger();
-            _cpuPerfLogger.Label = "cur";
-            _cpuLogger = plot.AddDataLogger();
-            _cpuLogger.Label = "pro";
+            _sysLogger = plot.AddDataLogger(label: "total");
+            _cpuPerfLogger = plot.AddDataLogger(label: "cur (counter)");
+            _cpuLogger = plot.AddDataLogger(label: "pro (timer)");
 
-            _Update_View(false);
+            _cpuLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _memLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _vmemLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _uplinkLogger.ViewSlide(SLIDE_VIEW_WIDTH);
+            _downlinkLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _sysLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _cpuPerfLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
         }
 
         async Task UpdateInfo ()
         {
+            await Task.Delay(TimeSpan.FromMilliseconds(1000));
+
             if ( !File.Exists(_csvPath) )
             {
                 return;
@@ -190,15 +202,15 @@ namespace PerfMonitor
                 records = csv.GetRecords<RunStatusItem>().ToList();
                 int length = records.Count;
 
-                for ( int i = 0; i < length; i++ )
+                foreach (var rd in records)
                 {
-                    _cpuLogger.Add(_cpuLogger.Count, records[i].Cpu);
-                    _memLogger.Add(_memLogger.Count, records[i].PhyMem);
-                    _vmemLogger.Add(_vmemLogger.Count, records[i].VMem);
-                    _uplinkLogger.Add(_uplinkLogger.Count, records[i].UpLink);
-                    _downlinkLogger.Add(_downlinkLogger.Count, records[i].DownLink);
-                    _sysLogger.Add(_sysLogger.Count, records[i].SysCpu);
-                    _cpuPerfLogger.Add(_cpuPerfLogger.Count, records[i].CpuPerf);
+                    _cpuLogger.Add(_cpuLogger.Count, rd.Cpu);
+                    _memLogger.Add(_memLogger.Count, rd.PhyMem);
+                    _vmemLogger.Add(_vmemLogger.Count, rd.VMem);
+                    _uplinkLogger.Add(_uplinkLogger.Count, rd.UpLink);
+                    _downlinkLogger.Add(_downlinkLogger.Count, rd.DownLink);
+                    _sysLogger.Add(_sysLogger.Count, rd.SysCpu);
+                    _cpuPerfLogger.Add(_cpuPerfLogger.Count, rd.CpuPerf);
                 }
 
                 if ( length > 0 )
@@ -212,11 +224,7 @@ namespace PerfMonitor
 
                 if ( _refresh_counter < 10 )
                 {
-                    PlotMem.Refresh();
-                    PlotVMem.Refresh();
-                    PlotUpLink.Refresh();
-                    PlotDownlink.Refresh();
-                    PlotPerf.Refresh();
+                    _Refresh_View();
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(1000));
@@ -231,30 +239,10 @@ namespace PerfMonitor
             _sysLogger?.Clear();
         }
 
-        private void _Update_View (bool full)
+        private void _Refresh_View ()
         {
-            if ( full )
-            {
-                _cpuLogger?.ViewFull();
-                _memLogger?.ViewFull();
-                _vmemLogger?.ViewFull();
-                _uplinkLogger.ViewFull();
-                _downlinkLogger?.ViewFull();
-                _sysLogger?.ViewFull();
-                _cpuPerfLogger?.ViewFull();
-            }
-            else
-            {
-                _cpuLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
-                _memLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
-                _vmemLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
-                _uplinkLogger.ViewSlide(SLIDE_VIEW_WIDTH);
-                _downlinkLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
-                _sysLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
-                _cpuPerfLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
-            }
-
-            UpdateYAxisLimits();
+            _Update_YAxisLimits();
+            _Update_Quality();
 
             PlotMem.Refresh();
             PlotVMem.Refresh();
@@ -263,18 +251,7 @@ namespace PerfMonitor
             PlotPerf.Refresh();
         }
 
-        private void BtnFull_Click (object sender, EventArgs e)
-        {
-            _Update_View(true);
-        }
-
-
-        private void BtnSlide_Click (object sender, EventArgs e)
-        {
-            _Update_View(false);
-        }
-
-        private void UpdateYAxisLimits ()
+        private void _Update_YAxisLimits ()
         {
             {
                 double yMin = Math.Min(Math.Min(_sysLogger.GetAxisLimits().YMin, _cpuPerfLogger.GetAxisLimits().YMin), _cpuLogger.GetAxisLimits().YMin);
@@ -299,28 +276,48 @@ namespace PerfMonitor
             }
         }
 
-        private void btnHighQuality_Click (object sender, EventArgs e)
+        private void _Update_Quality ()
         {
-            var quality = PlotMem.Configuration.Quality == ScottPlot.Control.QualityMode.Low ? ScottPlot.Control.QualityMode.High : ScottPlot.Control.QualityMode.Low;
+            var quality = _sysLogger.Plot.GetAxisLimits().XSpan < 5000 ? ScottPlot.Control.QualityMode.High : ScottPlot.Control.QualityMode.Low;
             PlotMem.Configuration.Quality = quality;
             PlotUpLink.Configuration.Quality = quality;
             PlotDownlink.Configuration.Quality = quality;
             PlotPerf.Configuration.Quality = quality;
             PlotVMem.Configuration.Quality = quality;
-
-            PlotMem.Refresh();
-            PlotVMem.Refresh();
-            PlotUpLink.Refresh();
-            PlotDownlink.Refresh();
-            PlotPerf.Refresh();
         }
 
         private void VisualForm_KeyDown (object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Escape )
+            if ( e.KeyCode == Keys.Escape )
             {
                 Close();
             }
+        }
+
+        private void RadioFull_CheckedChanged (object sender, EventArgs e)
+        {
+            _cpuLogger?.ViewFull();
+            _memLogger?.ViewFull();
+            _vmemLogger?.ViewFull();
+            _uplinkLogger.ViewFull();
+            _downlinkLogger?.ViewFull();
+            _sysLogger?.ViewFull();
+            _cpuPerfLogger?.ViewFull();
+
+            _Refresh_View();
+        }
+
+        private void RadioSlide_CheckedChanged (object sender, EventArgs e)
+        {
+            _cpuLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _memLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _vmemLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _uplinkLogger.ViewSlide(SLIDE_VIEW_WIDTH);
+            _downlinkLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _sysLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+            _cpuPerfLogger?.ViewSlide(SLIDE_VIEW_WIDTH);
+
+            _Refresh_View();
         }
     }
 }
