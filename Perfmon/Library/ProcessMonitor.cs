@@ -229,7 +229,7 @@ namespace PerfMonitor
                         }
 
                         var q = sw.ElapsedMilliseconds;
-                        var d = _interval - (q % _interval);
+                        var d = Math.Min(_interval,  _interval - (q % _interval));
                         Thread.Sleep(TimeSpan.FromMilliseconds(d));
 
                         lastMonitorTicks = nowTicks;

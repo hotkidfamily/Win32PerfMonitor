@@ -17,13 +17,6 @@ namespace PerfMonitor
         private bool _close_when_exception = false;
         private static string _logPath = default!;
 
-        internal enum MonitorStatus : uint
-        {
-            MonitorStatusMonitoring = 0,
-            MonitorStatusStopped = 1,
-            MonitorStatusRemoved = 2,
-        };
-
         internal class ProcessMonitorContext : IDisposable
         {
             public ProcessMonitor? Monitor;
@@ -31,7 +24,6 @@ namespace PerfMonitor
             public CsvWriter? ResWriter;
             public string? ResPath;
             public Form? _visualForm;
-            public MonitorStatus MntStatus;
             public HistoryContext? history;
             public bool IsDisposed = false;
             public int PID = 0;
@@ -40,7 +32,6 @@ namespace PerfMonitor
             {
                 IsDisposed = true;
                 Stop();
-                MntStatus = MonitorStatus.MonitorStatusRemoved;
                 _visualForm?.Close();
             }
 
@@ -51,18 +42,16 @@ namespace PerfMonitor
                 Monitor = null;
                 ResWriter = null;
 
-                if ( history != null )
+                if ( history != null && history.Running)
                 {
                     history.Running = false;
                     history.End = DateTime.Now;
                 }
-
-                MntStatus = MonitorStatus.MonitorStatusStopped;
             }
 
             public bool IsStop ()
             {
-                return MntStatus == MonitorStatus.MonitorStatusStopped;
+                return !history?.Running ?? true;
             }
         }
 
@@ -401,7 +390,6 @@ namespace PerfMonitor
                     Monitor = monitor,
                     ResWriter = csv,
                     ResPath = resPath,
-                    MntStatus = MonitorStatus.MonitorStatusMonitoring,
                 };
                 csv.WriteHeader<RunStatusItem>();
                 csv.NextRecord();
@@ -532,6 +520,12 @@ namespace PerfMonitor
                 var item = LVMonitorDetail.FocusedItem;
                 if ( item != null && item.Bounds.Contains(e.Location) )
                 {
+                    var ctx = item.Tag as ProcessMonitorContext;
+                    if(ctx != null)
+                    {
+                        restartCaptureToolStripMenuItem.Enabled = ctx.IsStop();
+                        stopToolStripMenuItem.Enabled = !ctx.IsStop();
+                    }
                     ItemContextMenuStrip.Show(Cursor.Position);
                 }
             }
