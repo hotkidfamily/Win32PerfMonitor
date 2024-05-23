@@ -164,6 +164,7 @@ namespace PerfMonitor
             PlotSysCpuUsage.Configuration.ScrollWheelZoom = false;
             ScottPlot.PixelPadding padding = new(50, 4, 4, 2);
             PlotSysCpuUsage.Plot.ManualDataArea(padding);
+            PlotSysCpuUsage.Plot.YAxis.SetBoundary(min: -5, max: 105);
             _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
             _cpu_max_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color:Color.Red, width:1, ScottPlot.LineStyle.Dot);
             _cpu_max_line.PositionLabel = true;
@@ -310,6 +311,7 @@ namespace PerfMonitor
                 double pVRam = _proc.VirtualMemorySize64 * 1.0 / Units.GB;
                 int pPhyRam = (int)(_proc.WorkingSet64 / Units.MB);
                 _sysCpu = cpuTotal.NextValue();
+                _sysCpu = _sysCpu > 100 ? 100 : _sysCpu;
 
                 var sb = $"{_sysCpu:F2}%, {ram}MB, {rama}MB | {core} C, {mnam}, {os}, {_phyMemTotal}GB | {pVRam:F2}GB, {pPhyRam}MB";
 
@@ -319,20 +321,12 @@ namespace PerfMonitor
                 })
                 );
 
-                double amax = _cpuStreamer.DataMax;
+                _cpuStreamer.Add(_sysCpu);
                 double vmax = _cpuStreamer.Data.Max();
-                if ( vmax <= 100 && amax > 100 )
-                {
-                    PlotSysCpuUsage.Plot.YAxis.SetBoundary(min:0, max: vmax*1.1);
-                    var b = _cpuStreamer.Data;
-                    _cpuStreamer.Clear();
-                    _cpuStreamer.AddRange(b);
-                }
                 _cpu_max_line.Y = vmax;
                 _cpu_max_line.Label = $"{vmax}";
                 _cpu_cur_line.Y = _sysCpu;
                 _cpu_cur_line.Label = $"{_sysCpu}";
-                _cpuStreamer.Add(_sysCpu);
                 
                 PlotSysCpuUsage.Invoke(() =>
                 {
