@@ -14,6 +14,8 @@ namespace PerfMonitor
         private static readonly List<RunStatusItem> _monitorResult = new();
         private readonly HistoryController _historyController;
         private ScottPlot.Plottable.DataStreamer  _cpuStreamer = default!;
+        private ScottPlot.Plottable.HLine _cpu_max_line = default!;
+        private ScottPlot.Plottable.HLine _cpu_cur_line = default!;
         private bool _close_when_exception = false;
         private static string _logPath = default!;
 
@@ -163,6 +165,14 @@ namespace PerfMonitor
             ScottPlot.PixelPadding padding = new(50, 4, 4, 2);
             PlotSysCpuUsage.Plot.ManualDataArea(padding);
             _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
+            _cpu_max_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color:Color.Red, width:1, ScottPlot.LineStyle.Dot);
+            _cpu_max_line.PositionLabel = true;
+            _cpu_max_line.PositionLabelBackground = Color.Red;
+            _cpu_max_line.PositionFormatter = position => ((int)position).ToString();
+            _cpu_cur_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color: Color.Green, width: 1, ScottPlot.LineStyle.Dot);
+            _cpu_cur_line.PositionLabel = true;
+            _cpu_cur_line.PositionLabelBackground = Color.Green;
+            _cpu_cur_line.PositionFormatter = position => ((int) position).ToString();
             _cpuStreamer.LineWidth = 1;
             _cpuStreamer.ViewScrollLeft();
             PlotSysCpuUsage.Refresh();
@@ -308,7 +318,22 @@ namespace PerfMonitor
                     labelCpuAndMem.Text = sb;
                 })
                 );
+
+                double amax = _cpuStreamer.DataMax;
+                double vmax = _cpuStreamer.Data.Max();
+                if ( vmax <= 100 && amax > 100 )
+                {
+                    PlotSysCpuUsage.Plot.YAxis.SetBoundary(min:0, max: vmax*1.1);
+                    var b = _cpuStreamer.Data;
+                    _cpuStreamer.Clear();
+                    _cpuStreamer.AddRange(b);
+                }
+                _cpu_max_line.Y = vmax;
+                _cpu_max_line.Label = $"{vmax}";
+                _cpu_cur_line.Y = _sysCpu;
+                _cpu_cur_line.Label = $"{_sysCpu}";
                 _cpuStreamer.Add(_sysCpu);
+                
                 PlotSysCpuUsage.Invoke(() =>
                 {
                     PlotSysCpuUsage.Refresh();
