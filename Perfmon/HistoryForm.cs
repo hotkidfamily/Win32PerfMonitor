@@ -86,8 +86,17 @@ namespace PerfMonitor
                 HistoryContext v = (HistoryContext)item.Tag;
                 if ( !v.Running )
                 {
-                    _history.RemoveItem(v);
-                    LVHistory.Items.Remove(item);
+                    System.IO.FileInfo fi = new System.IO.FileInfo(v.ResPath);
+                    if ( fi.Exists )
+                    {
+                        fi.Delete();
+                    }
+
+                    if(!fi.Exists)
+                    {
+                        _history.RemoveItem(v);
+                        LVHistory.Items.Remove(item);
+                    }
                 }
             }
         }
