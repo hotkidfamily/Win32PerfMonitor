@@ -30,7 +30,25 @@ namespace PerfMonitor
             LVHistory.BeginUpdate();
             foreach ( var res in _history.History )
             {
-                var lvi = new ListViewItem(res.Info())
+                ListViewGroup group = null;
+                foreach ( ListViewGroup lvgExistingGroup in LVHistory.Groups )
+                { 
+                    if ( lvgExistingGroup.Header.Equals(res.Begin.ToString("D")) )
+                    {
+                        group = lvgExistingGroup;
+                        break;
+                    }
+                }
+                if ( group == null )
+                {
+                    group = new ListViewGroup(res.Begin.ToString("D"), HorizontalAlignment.Left)
+                    {
+                        CollapsedState = ListViewGroupCollapsedState.Expanded
+                    };
+                    LVHistory.Groups.Add(group);
+                }
+
+                var lvi = new ListViewItem(res.Info(), group)
                 {
                     Tag = res
                 };
