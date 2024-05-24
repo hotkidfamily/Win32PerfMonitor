@@ -313,7 +313,7 @@ namespace PerfMonitor
                 _sysCpu = cpuTotal.NextValue();
                 _sysCpu = _sysCpu > 100 ? 100 : _sysCpu;
 
-                var sb = $"{_sysCpu:F2}%, {ram}MB, {rama}MB | {core} C, {mnam}, {os}, {_phyMemTotal}GB | {pVRam:F2}GB, {pPhyRam}MB";
+                var sb = $"{_sysCpu}%, {ram}MB, {rama}MB | {core} C, {mnam}, {os}, {_phyMemTotal}GB | {pVRam:F2}GB, {pPhyRam}MB";
 
                 labelCpuAndMem.Invoke(new Action(() =>
                 {
