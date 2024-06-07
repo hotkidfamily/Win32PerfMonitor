@@ -293,17 +293,18 @@ namespace PerfMonitor
             var core = Environment.ProcessorCount;
             var mnam = Environment.MachineName;
             var os = Environment.OSVersion.Version.ToString();
-            using PerformanceCounter ramAva = new("Memory", "Available Bytes");
-            using PerformanceCounter ramUsed = new("Memory", "Committed Bytes");
 
-            string strGpuQuery = "\\GPU Engine(*engtype_3D)\\Utilization Percentage";
-            string strGpuMemQuery = "\\GPU Process Memory(*)\\Local Usage";
-            string strGpuEncQuery = "\\GPU Engine(*engtype_VideoEncode)\\Utilization Percentage";
-            string strGpuDecQuery = "\\GPU Engine(*engtype_VideoDecode)\\Utilization Percentage";
-            using PerfQueryArray gpuUsage = new(strGpuQuery);
-            using PerfQueryArray gpuMemUsage = new(strGpuMemQuery);
-            using PerfQueryArray gpuEncUsage = new(strGpuEncQuery);
-            using PerfQueryArray gpuDecUsage = new(strGpuDecQuery);
+            const string strMemAvaliable = "\\Memory\\Available Bytes";
+            const string strGpuQuery = "\\GPU Engine(*engtype_3D)\\Utilization Percentage";
+            const string strGpuMemQuery = "\\GPU Process Memory(*)\\Local Usage";
+            const string strGpuEncQuery = "\\GPU Engine(*engtype_VideoEncode)\\Utilization Percentage";
+            const string strGpuDecQuery = "\\GPU Engine(*engtype_VideoDecode)\\Utilization Percentage";
+
+            using PerfQueryWildcard gpuUsage = new(strGpuQuery);
+            using PerfQueryWildcard gpuMemUsage = new(strGpuMemQuery);
+            using PerfQueryWildcard gpuEncUsage = new(strGpuEncQuery);
+            using PerfQueryWildcard gpuDecUsage = new(strGpuDecQuery);
+            using PerfQuery ramAva = new(strMemAvaliable);
 
             string strQuery;
             if ( Environment.OSVersion.Version.Major >= 10 )
@@ -320,18 +321,16 @@ namespace PerfMonitor
             while ( !IsDisposed )
             {
                 _proc.Refresh();
-                int rama = (int)((long)Math.Round(ramAva?.NextValue() ?? 0) / Units.MB);
-                int ram = (int)((long)(ramUsed?.NextValue() ?? 0) / Units.MB) + rama;
+                int rama = (int)(ramAva.NextValue() / Units.MB);
                 double pVRam = _proc.VirtualMemorySize64 * 1.0 / Units.GB;
                 int pPhyRam = (int)(_proc.WorkingSet64 / Units.MB);
-                _sysCpu = cpuTotal.NextValue();
-                _sysCpu = _sysCpu > 100 ? 100 : _sysCpu;
+                _sysCpu = Math.Min(100, cpuTotal.NextValue());
                 _sysGpu = gpuUsage.NextValue();
                 var gpuMem = gpuMemUsage.NextValue() / Units.MB;
                 var gpuEnc = gpuEncUsage.NextValue();
                 var gpuDec = gpuDecUsage.NextValue();
 
-                var sb = $"{_sysCpu}%, {ram}MB, {rama}MB | {_sysGpu}%, {gpuMem}MB, {gpuEnc}%, {gpuDec}% | {core} C, {mnam}, {os}, {_phyMemTotal}GB | {pVRam:F2}GB, {pPhyRam}MB";
+                var sb = $"{_sysCpu}%, {rama}MB, {_phyMemTotal}GB | {_sysGpu}%, {gpuMem}MB, {gpuEnc}%, {gpuDec}% | {core} C, {mnam}, {os} | {pVRam:F2}GB, {pPhyRam}MB";
 
                 labelCpuAndMem.Invoke(new Action(() =>
                 {

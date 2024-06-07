@@ -181,13 +181,13 @@ namespace PerfMonitor
     }
 
 
-    internal class PerfQueryArray : IDisposable
+    internal class PerfQueryWildcard : IDisposable
     {
         private nint _hQuery;
         private nint _hCounter;
         private bool _first = true;
 
-        public PerfQueryArray(string query)
+        public PerfQueryWildcard(string query)
         {
             PInvoke.PdhOpenQuery(null, 0, out _hQuery);
             nuint user = 0;
