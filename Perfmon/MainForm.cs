@@ -14,8 +14,9 @@ namespace PerfMonitor
         private static readonly List<RunStatusItem> _monitorResult = new();
         private readonly HistoryController _historyController;
         private ScottPlot.Plottable.DataStreamer  _cpuStreamer = default!;
+        private ScottPlot.Plottable.DataStreamer _gpuStreamer = default!;
         private ScottPlot.Plottable.HLine _cpu_max_line = default!;
-        private ScottPlot.Plottable.HLine _cpu_cur_line = default!;
+        //private ScottPlot.Plottable.HLine _cpu_cur_line = default!;
         private bool _close_when_exception = false;
         private static string _logPath = default!;
 
@@ -65,7 +66,8 @@ namespace PerfMonitor
 
         private static readonly Process _proc = Process.GetCurrentProcess();
 
-        private double _sysCpu = 0;
+        private long _sysCpu = 0;
+        private long _sysGpu = 0;
         private string _taskList = string.Empty;
 
         private static string LogFolder
@@ -166,16 +168,19 @@ namespace PerfMonitor
             PlotSysCpuUsage.Plot.ManualDataArea(padding);
             PlotSysCpuUsage.Plot.YAxis.SetBoundary(min: -5, max: 105);
             _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
-            _cpu_max_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color:Color.Red, width:1, ScottPlot.LineStyle.Dot);
+            _gpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
+            _cpu_max_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color: Color.Red, width: 1, ScottPlot.LineStyle.Dot);
             _cpu_max_line.PositionLabel = true;
             _cpu_max_line.PositionLabelBackground = Color.Red;
             _cpu_max_line.PositionFormatter = position => ((int)position).ToString();
-            _cpu_cur_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color: Color.Green, width: 1, ScottPlot.LineStyle.Dot);
+/*            _cpu_cur_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color: Color.Green, width: 1, ScottPlot.LineStyle.Dot);
             _cpu_cur_line.PositionLabel = true;
             _cpu_cur_line.PositionLabelBackground = Color.Green;
-            _cpu_cur_line.PositionFormatter = position => ((int) position).ToString();
+            _cpu_cur_line.PositionFormatter = position => ((int) position).ToString();*/
             _cpuStreamer.LineWidth = 1;
             _cpuStreamer.ViewScrollLeft();
+            _gpuStreamer.LineWidth = 1;
+            _gpuStreamer.ViewScrollLeft();
             PlotSysCpuUsage.Refresh();
             CenterToScreen();
         }
@@ -291,6 +296,15 @@ namespace PerfMonitor
             using PerformanceCounter ramAva = new("Memory", "Available Bytes");
             using PerformanceCounter ramUsed = new("Memory", "Committed Bytes");
 
+            string strGpuQuery = "\\GPU Engine(*engtype_3D)\\Utilization Percentage";
+            string strGpuMemQuery = "\\GPU Process Memory(*)\\Local Usage";
+            string strGpuEncQuery = "\\GPU Engine(*engtype_VideoEncode)\\Utilization Percentage";
+            string strGpuDecQuery = "\\GPU Engine(*engtype_VideoDecode)\\Utilization Percentage";
+            using PerfQueryArray gpuUsage = new(strGpuQuery);
+            using PerfQueryArray gpuMemUsage = new(strGpuMemQuery);
+            using PerfQueryArray gpuEncUsage = new(strGpuEncQuery);
+            using PerfQueryArray gpuDecUsage = new(strGpuDecQuery);
+
             string strQuery;
             if ( Environment.OSVersion.Version.Major >= 10 )
             {
@@ -312,8 +326,12 @@ namespace PerfMonitor
                 int pPhyRam = (int)(_proc.WorkingSet64 / Units.MB);
                 _sysCpu = cpuTotal.NextValue();
                 _sysCpu = _sysCpu > 100 ? 100 : _sysCpu;
+                _sysGpu = gpuUsage.NextValue();
+                var gpuMem = gpuMemUsage.NextValue() / Units.MB;
+                var gpuEnc = gpuEncUsage.NextValue();
+                var gpuDec = gpuDecUsage.NextValue();
 
-                var sb = $"{_sysCpu}%, {ram}MB, {rama}MB | {core} C, {mnam}, {os}, {_phyMemTotal}GB | {pVRam:F2}GB, {pPhyRam}MB";
+                var sb = $"{_sysCpu}%, {ram}MB, {rama}MB | {_sysGpu}%, {gpuMem}MB, {gpuEnc}%, {gpuDec}% | {core} C, {mnam}, {os}, {_phyMemTotal}GB | {pVRam:F2}GB, {pPhyRam}MB";
 
                 labelCpuAndMem.Invoke(new Action(() =>
                 {
@@ -325,9 +343,11 @@ namespace PerfMonitor
                 double vmax = _cpuStreamer.Data.Max();
                 _cpu_max_line.Y = vmax;
                 _cpu_max_line.Label = $"{vmax}";
-                _cpu_cur_line.Y = _sysCpu;
-                _cpu_cur_line.Label = $"{_sysCpu}";
-                
+/*                _cpu_cur_line.Y = _sysCpu;
+                _cpu_cur_line.Label = $"{_sysCpu}";*/
+
+                _gpuStreamer.Add(_sysGpu);
+
                 PlotSysCpuUsage.Invoke(() =>
                 {
                     PlotSysCpuUsage.Refresh();
@@ -340,6 +360,7 @@ namespace PerfMonitor
 
             cpuTotal?.Dispose();
             _cpuStreamer.Clear();
+            _gpuStreamer.Clear();
         }
 
         private void TextBoxPID_KeyPress (object sender, KeyPressEventArgs e)
