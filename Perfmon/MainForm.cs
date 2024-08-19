@@ -13,10 +13,10 @@ namespace PerfMonitor
         private static int _phyMemTotal = 0;
         private static readonly List<RunStatusItem> _monitorResult = new();
         private readonly HistoryController _historyController;
-        private ScottPlot.Plottable.DataStreamer  _cpuStreamer = default!;
+        private ScottPlot.Plottable.DataStreamer _cpuStreamer = default!;
         private ScottPlot.Plottable.DataStreamer _gpuStreamer = default!;
-        private ScottPlot.Plottable.HLine _cpu_max_line = default!;
-        //private ScottPlot.Plottable.HLine _cpu_cur_line = default!;
+        private ScottPlot.Plottable.MarkerPlot _cpuMaxMarker = default!;
+        private ScottPlot.Plottable.MarkerPlot _gpuMaxMarker = default!;
         private bool _close_when_exception = false;
         private static string _logPath = default!;
 
@@ -146,7 +146,6 @@ namespace PerfMonitor
             ConstructListView();
 
             _phyMemTotal = GetPhisicalMemory();
-            Task.Run(QuerySystemInfo);
             _ = RefreshListView();
             labelCpuAndMem.Text = "loading...";
             _taskList = Path.Combine(ConfigFolder + "\\tasks.json");
@@ -155,8 +154,8 @@ namespace PerfMonitor
 
             this.Text += $" {Resources.AppVersion}";
 
-            PlotSysCpuUsage.Name = "CPU";
-            PlotSysCpuUsage.Plot.YLabel("CPU (%)");
+            PlotSysCpuUsage.Name = "xPU";
+            PlotSysCpuUsage.Plot.YLabel("xPU (%)");
             PlotSysCpuUsage.Plot.YAxis.SetBoundary(-5, 200);
             PlotSysCpuUsage.Plot.XAxis.SetBoundary(0);
             PlotSysCpuUsage.Plot.XAxis.Ticks(false);
@@ -167,22 +166,38 @@ namespace PerfMonitor
             ScottPlot.PixelPadding padding = new(50, 4, 4, 2);
             PlotSysCpuUsage.Plot.ManualDataArea(padding);
             PlotSysCpuUsage.Plot.YAxis.SetBoundary(min: -5, max: 105);
+            _cpuMaxMarker = PlotSysCpuUsage.Plot.AddMarker(0, 0);
+            _cpuMaxMarker.Color = Color.Red;
+            _cpuMaxMarker.Text = "MaxPoint";
+            _cpuMaxMarker.TextFont.Color = Color.Red;
+            _cpuMaxMarker.TextFont.Alignment = ScottPlot.Alignment.UpperRight;
+            _cpuMaxMarker.TextFont.Size = 15;
+
+            _gpuMaxMarker = PlotSysCpuUsage.Plot.AddMarker(0, 0);
+            _gpuMaxMarker.Text = "MaxPoint";
+            _gpuMaxMarker.Color = Color.Blue;
+            _gpuMaxMarker.TextFont.Color = Color.Blue;
+            _gpuMaxMarker.TextFont.Alignment = ScottPlot.Alignment.UpperRight;
+            _gpuMaxMarker.TextFont.Size = 15;
+
             _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
-            _gpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
-            _cpu_max_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color: Color.Red, width: 1, ScottPlot.LineStyle.Dot);
-            _cpu_max_line.PositionLabel = true;
-            _cpu_max_line.PositionLabelBackground = Color.Red;
-            _cpu_max_line.PositionFormatter = position => ((int)position).ToString();
-/*            _cpu_cur_line = PlotSysCpuUsage.Plot.AddHorizontalLine(0.0, color: Color.Green, width: 1, ScottPlot.LineStyle.Dot);
-            _cpu_cur_line.PositionLabel = true;
-            _cpu_cur_line.PositionLabelBackground = Color.Green;
-            _cpu_cur_line.PositionFormatter = position => ((int) position).ToString();*/
+            _cpuStreamer.Label = "cpu";
             _cpuStreamer.LineWidth = 1;
             _cpuStreamer.ViewScrollLeft();
+            _cpuStreamer.Color = Color.Red;
+
+            _gpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
+            _gpuStreamer.Label = "gpu";
             _gpuStreamer.LineWidth = 1;
             _gpuStreamer.ViewScrollLeft();
+            _gpuStreamer.Color = Color.Blue;
+
+            var legend = PlotSysCpuUsage.Plot.Legend(true, ScottPlot.Alignment.UpperRight);
+            legend.Orientation = ScottPlot.Orientation.Horizontal;
+
             PlotSysCpuUsage.Refresh();
             CenterToScreen();
+            Task.Run(QuerySystemInfo);
         }
 
         private void BtnShotProcess_MouseDown (object sender, MouseEventArgs e)
@@ -293,6 +308,7 @@ namespace PerfMonitor
             var core = Environment.ProcessorCount;
             var mnam = Environment.MachineName;
             var os = Environment.OSVersion.Version.ToString();
+            await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
             const string strMemAvaliable = "\\Memory\\Available Bytes";
             const string strGpuQuery = "\\GPU Engine(*engtype_3D)\\Utilization Percentage";
@@ -339,13 +355,17 @@ namespace PerfMonitor
                 );
 
                 _cpuStreamer.Add(_sysCpu);
+
                 double vmax = _cpuStreamer.Data.Max();
-                _cpu_max_line.Y = vmax;
-                _cpu_max_line.Label = $"{vmax}";
-/*                _cpu_cur_line.Y = _sysCpu;
-                _cpu_cur_line.Label = $"{_sysCpu}";*/
+                _cpuMaxMarker.X = 200 - (_cpuStreamer.NextIndex - _cpuStreamer.Data.ToList().IndexOf(vmax));
+                _cpuMaxMarker.Y = vmax;
+                _cpuMaxMarker.Text = vmax.ToString();
 
                 _gpuStreamer.Add(_sysGpu);
+                double gmax = _gpuStreamer.Data.Max();
+                _gpuMaxMarker.X = 200 - (_gpuStreamer.NextIndex - _gpuStreamer.Data.ToList().IndexOf(gmax));
+                _gpuMaxMarker.Y = gmax;
+                _gpuMaxMarker.Text = gmax.ToString();
 
                 PlotSysCpuUsage.Invoke(() =>
                 {
