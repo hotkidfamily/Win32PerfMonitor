@@ -19,6 +19,7 @@ namespace PerfMonitor
         private ScottPlot.Plottable.MarkerPlot _gpuMaxMarker = default!;
         private bool _close_when_exception = false;
         private static string _logPath = default!;
+        private static int _viewSlidingWindowLength = 200;
 
         internal class ProcessMonitorContext : IDisposable
         {
@@ -156,7 +157,7 @@ namespace PerfMonitor
 
             PlotSysCpuUsage.Name = "xPU";
             PlotSysCpuUsage.Plot.YLabel("xPU (%)");
-            PlotSysCpuUsage.Plot.YAxis.SetBoundary(-5, 200);
+            PlotSysCpuUsage.Plot.YAxis.SetBoundary(-5, _viewSlidingWindowLength);
             PlotSysCpuUsage.Plot.XAxis.SetBoundary(0);
             PlotSysCpuUsage.Plot.XAxis.Ticks(false);
             PlotSysCpuUsage.Configuration.RightClickDragZoom = false;
@@ -180,13 +181,13 @@ namespace PerfMonitor
             _gpuMaxMarker.TextFont.Alignment = ScottPlot.Alignment.UpperRight;
             _gpuMaxMarker.TextFont.Size = 15;
 
-            _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
+            _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(_viewSlidingWindowLength);
             _cpuStreamer.Label = "cpu";
             _cpuStreamer.LineWidth = 1;
             _cpuStreamer.ViewScrollLeft();
             _cpuStreamer.Color = Color.Red;
 
-            _gpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(200);
+            _gpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(_viewSlidingWindowLength);
             _gpuStreamer.Label = "gpu";
             _gpuStreamer.LineWidth = 1;
             _gpuStreamer.ViewScrollLeft();
@@ -354,18 +355,23 @@ namespace PerfMonitor
                 })
                 );
 
-                _cpuStreamer.Add(_sysCpu);
+                Func<ScottPlot.Plottable.DataStreamer, int> calcPos = p => {
+                    int nxt = p.NextIndex;
+                    double max = p.Data.Max();
+                    int idx = p.Data.ToList().IndexOf(max);
+                    int ridx = nxt > idx ? nxt - idx : _viewSlidingWindowLength - idx + nxt;
+                    return _viewSlidingWindowLength - ridx;
+                };
 
-                double vmax = _cpuStreamer.Data.Max();
-                _cpuMaxMarker.X = 200 - (_cpuStreamer.NextIndex - _cpuStreamer.Data.ToList().IndexOf(vmax));
-                _cpuMaxMarker.Y = vmax;
-                _cpuMaxMarker.Text = vmax.ToString();
+                _cpuStreamer.Add(_sysCpu);
+                _cpuMaxMarker.X = calcPos(_cpuStreamer);
+                _cpuMaxMarker.Y = _cpuStreamer.Data.Max();
+                _cpuMaxMarker.Text = _cpuMaxMarker.Y.ToString();
 
                 _gpuStreamer.Add(_sysGpu);
-                double gmax = _gpuStreamer.Data.Max();
-                _gpuMaxMarker.X = 200 - (_gpuStreamer.NextIndex - _gpuStreamer.Data.ToList().IndexOf(gmax));
-                _gpuMaxMarker.Y = gmax;
-                _gpuMaxMarker.Text = gmax.ToString();
+                _gpuMaxMarker.X = calcPos(_gpuStreamer);
+                _gpuMaxMarker.Y = _gpuStreamer.Data.Max();
+                _gpuMaxMarker.Text = _gpuMaxMarker.Y.ToString();
 
                 PlotSysCpuUsage.Invoke(() =>
                 {
