@@ -3,8 +3,6 @@ using CsvHelper.Configuration;
 using ScottPlot;
 using ScottPlot.Plottable;
 using System.Globalization;
-using System.Windows.Forms;
-using static ScottPlot.Plottable.PopulationPlot;
 
 namespace PerfMonitor
 {

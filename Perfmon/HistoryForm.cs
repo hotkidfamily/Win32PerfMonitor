@@ -1,6 +1,5 @@
 ﻿using PerfMonitor.Library;
 using System.Diagnostics;
-using static PerfMonitor.MainForm;
 
 namespace PerfMonitor
 {

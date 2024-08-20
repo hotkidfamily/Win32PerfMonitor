@@ -1,9 +1,4 @@
-﻿using Microsoft.Diagnostics.Tracing.Parsers.FrameworkEventSource;
-using ScottPlot.Styles;
-using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using static PerfMonitor.ProcsEnumForm;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+﻿using System.Diagnostics;
 
 namespace PerfMonitor
 {
