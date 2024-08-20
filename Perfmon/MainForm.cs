@@ -21,44 +21,6 @@ namespace PerfMonitor
         private static string _logPath = default!;
         private static int PLOT_WINDOW_SIZE = 200;
 
-        internal class ProcessMonitorContext : IDisposable
-        {
-            public ProcessMonitor? Monitor;
-            public int LiveVideIndex = 0;
-            public CsvWriter? ResWriter;
-            public string? ResPath;
-            public Form? _visualForm;
-            public HistoryContext? history;
-            public bool IsDisposed = false;
-            public int PID = 0;
-
-            public void Dispose ()
-            {
-                IsDisposed = true;
-                Stop();
-                _visualForm?.Close();
-            }
-
-            public void Stop ()
-            {
-                Monitor?.Dispose();
-                ResWriter?.Dispose();
-                Monitor = null;
-                ResWriter = null;
-
-                if ( history != null && history.Running)
-                {
-                    history.Running = false;
-                    history.End = DateTime.Now;
-                }
-            }
-
-            public bool IsStop ()
-            {
-                return !history?.Running ?? true;
-            }
-        }
-
         private readonly Dictionary<int, ProcessMonitorContext> _monitorManager = new();
 
         private readonly string[] _colHeaders = new string[] { "测试内容", "PID", "进程名", "运行时间", "CPU", "虚拟内存", "物理内存", "下行", "上行", "下行流量", "上行流量", "状态", };
@@ -69,7 +31,6 @@ namespace PerfMonitor
 
         private long _sysCpu = 0;
         private long _sysGpu = 0;
-        private string _taskList = string.Empty;
 
         private static string LogFolder
         {
@@ -149,12 +110,19 @@ namespace PerfMonitor
             _phyMemTotal = GetPhisicalMemory();
             _ = RefreshListView();
             labelCpuAndMem.Text = "loading...";
-            _taskList = Path.Combine(ConfigFolder + "\\tasks.json");
-            _historyController = new(_taskList);
+            string taskList = Path.Combine(ConfigFolder + "\\tasks.json");
+            _historyController = new(taskList);
             _historyController.Read();
 
             this.Text += $" {Resources.AppVersion}";
 
+            ConstructXPUUsage();
+            CenterToScreen();
+            Task.Run(QuerySystemInfo);
+        }
+
+        private void ConstructXPUUsage()
+        {
             PlotSysCpuUsage.Name = "xPU";
             PlotSysCpuUsage.Plot.YLabel("xPU (%)");
             PlotSysCpuUsage.Plot.YAxis.SetBoundary(-5, PLOT_WINDOW_SIZE);
@@ -191,8 +159,6 @@ namespace PerfMonitor
             legend.Orientation = ScottPlot.Orientation.Horizontal;
 
             PlotSysCpuUsage.Refresh();
-            CenterToScreen();
-            Task.Run(QuerySystemInfo);
         }
 
         private void BtnShotProcess_MouseDown (object sender, MouseEventArgs e)
@@ -782,6 +748,44 @@ namespace PerfMonitor
                 procs.FormClosed += Proc_FormClosed;
                 procs.ShowDialog();
             }
+        }
+    }
+
+    internal class ProcessMonitorContext : IDisposable
+    {
+        public ProcessMonitor? Monitor;
+        public int LiveVideIndex = 0;
+        public CsvWriter? ResWriter;
+        public string? ResPath;
+        public Form? _visualForm;
+        public HistoryContext? history;
+        public bool IsDisposed = false;
+        public int PID = 0;
+
+        public void Dispose()
+        {
+            IsDisposed = true;
+            Stop();
+            _visualForm?.Close();
+        }
+
+        public void Stop()
+        {
+            Monitor?.Dispose();
+            ResWriter?.Dispose();
+            Monitor = null;
+            ResWriter = null;
+
+            if (history != null && history.Running)
+            {
+                history.Running = false;
+                history.End = DateTime.Now;
+            }
+        }
+
+        public bool IsStop()
+        {
+            return !history?.Running ?? true;
         }
     }
 }
