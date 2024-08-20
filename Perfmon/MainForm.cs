@@ -19,7 +19,7 @@ namespace PerfMonitor
         private ScottPlot.Plottable.MarkerPlot _gpuMaxMarker = default!;
         private bool _close_when_exception = false;
         private static string _logPath = default!;
-        private static int _viewSlidingWindowLength = 200;
+        private static int PLOT_WINDOW_SIZE = 200;
 
         internal class ProcessMonitorContext : IDisposable
         {
@@ -157,7 +157,7 @@ namespace PerfMonitor
 
             PlotSysCpuUsage.Name = "xPU";
             PlotSysCpuUsage.Plot.YLabel("xPU (%)");
-            PlotSysCpuUsage.Plot.YAxis.SetBoundary(-5, _viewSlidingWindowLength);
+            PlotSysCpuUsage.Plot.YAxis.SetBoundary(-5, PLOT_WINDOW_SIZE);
             PlotSysCpuUsage.Plot.XAxis.SetBoundary(0);
             PlotSysCpuUsage.Plot.XAxis.Ticks(false);
             PlotSysCpuUsage.Configuration.RightClickDragZoom = false;
@@ -167,28 +167,22 @@ namespace PerfMonitor
             ScottPlot.PixelPadding padding = new(50, 4, 4, 2);
             PlotSysCpuUsage.Plot.ManualDataArea(padding);
             PlotSysCpuUsage.Plot.YAxis.SetBoundary(min: -5, max: 105);
-            _cpuMaxMarker = PlotSysCpuUsage.Plot.AddMarker(0, 0);
-            _cpuMaxMarker.Color = Color.Red;
-            _cpuMaxMarker.Text = "MaxPoint";
+            _cpuMaxMarker = PlotSysCpuUsage.Plot.AddMarker(0, 0, ScottPlot.MarkerShape.openDiamond, 5, Color.Red, "cpu");
             _cpuMaxMarker.TextFont.Color = Color.Red;
             _cpuMaxMarker.TextFont.Alignment = ScottPlot.Alignment.UpperRight;
             _cpuMaxMarker.TextFont.Size = 15;
 
-            _gpuMaxMarker = PlotSysCpuUsage.Plot.AddMarker(0, 0);
-            _gpuMaxMarker.Text = "MaxPoint";
-            _gpuMaxMarker.Color = Color.Blue;
+            _gpuMaxMarker = PlotSysCpuUsage.Plot.AddMarker(0, 0, ScottPlot.MarkerShape.openDiamond, 5, Color.Blue, "gpu");
             _gpuMaxMarker.TextFont.Color = Color.Blue;
             _gpuMaxMarker.TextFont.Alignment = ScottPlot.Alignment.UpperRight;
             _gpuMaxMarker.TextFont.Size = 15;
 
-            _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(_viewSlidingWindowLength);
-            _cpuStreamer.Label = "cpu";
+            _cpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(PLOT_WINDOW_SIZE);
             _cpuStreamer.LineWidth = 1;
             _cpuStreamer.ViewScrollLeft();
             _cpuStreamer.Color = Color.Red;
 
-            _gpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(_viewSlidingWindowLength);
-            _gpuStreamer.Label = "gpu";
+            _gpuStreamer = PlotSysCpuUsage.Plot.AddDataStreamer(PLOT_WINDOW_SIZE);
             _gpuStreamer.LineWidth = 1;
             _gpuStreamer.ViewScrollLeft();
             _gpuStreamer.Color = Color.Blue;
@@ -355,13 +349,14 @@ namespace PerfMonitor
                 })
                 );
 
-                Func<ScottPlot.Plottable.DataStreamer, int> calcPos = p => {
+                static int calcPos(ScottPlot.Plottable.DataStreamer p)
+                {
                     int nxt = p.NextIndex;
                     double max = p.Data.Max();
                     int idx = p.Data.ToList().IndexOf(max);
-                    int ridx = nxt > idx ? nxt - idx : _viewSlidingWindowLength - idx + nxt;
-                    return _viewSlidingWindowLength - ridx;
-                };
+                    int ridx = nxt > idx ? nxt - idx : PLOT_WINDOW_SIZE - idx + nxt;
+                    return PLOT_WINDOW_SIZE - ridx;
+                }
 
                 _cpuStreamer.Add(_sysCpu);
                 _cpuMaxMarker.X = calcPos(_cpuStreamer);

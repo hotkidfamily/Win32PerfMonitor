@@ -26,7 +26,7 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent ()
+        private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
@@ -69,13 +69,13 @@
             // 
             // labelCpuAndMem
             // 
-            labelCpuAndMem.Anchor =  AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            labelCpuAndMem.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             labelCpuAndMem.BorderStyle = BorderStyle.FixedSingle;
-            labelCpuAndMem.Location = new Point(12, 528);
+            labelCpuAndMem.Location = new Point(14, 621);
             labelCpuAndMem.Margin = new Padding(1);
             labelCpuAndMem.Name = "labelCpuAndMem";
             labelCpuAndMem.ReadOnly = true;
-            labelCpuAndMem.Size = new Size(899, 23);
+            labelCpuAndMem.Size = new Size(1027, 25);
             labelCpuAndMem.TabIndex = 5;
             labelCpuAndMem.TextAlign = HorizontalAlignment.Right;
             toolTip1.SetToolTip(labelCpuAndMem, "本机状态");
@@ -83,17 +83,18 @@
             // LVMonitorDetail
             // 
             LVMonitorDetail.Activation = ItemActivation.OneClick;
-            LVMonitorDetail.Anchor =  AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            LVMonitorDetail.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             LVMonitorDetail.BorderStyle = BorderStyle.FixedSingle;
             LVMonitorDetail.Columns.AddRange(new ColumnHeader[] { PID, procName, cpuUsage, vMem, phyMem, totalMem, downLink, upLink, totalLink, runningSeconds, monitorStatus, markder });
             LVMonitorDetail.FullRowSelect = true;
             LVMonitorDetail.GridLines = true;
             LVMonitorDetail.HideSelection = true;
             LVMonitorDetail.LabelEdit = true;
-            LVMonitorDetail.Location = new Point(12, 87);
+            LVMonitorDetail.Location = new Point(14, 102);
+            LVMonitorDetail.Margin = new Padding(3, 4, 3, 4);
             LVMonitorDetail.MultiSelect = false;
             LVMonitorDetail.Name = "LVMonitorDetail";
-            LVMonitorDetail.Size = new Size(899, 245);
+            LVMonitorDetail.Size = new Size(1027, 288);
             LVMonitorDetail.TabIndex = 3;
             LVMonitorDetail.UseCompatibleStateImageBehavior = false;
             LVMonitorDetail.View = View.Details;
@@ -164,17 +165,18 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 27);
+            label1.Location = new Point(14, 31);
             label1.Name = "label1";
-            label1.Size = new Size(96, 17);
+            label1.Size = new Size(111, 20);
             label1.TabIndex = 4;
             label1.Text = "输入 PID 开始：";
             // 
             // textBoxPID
             // 
-            textBoxPID.Location = new Point(115, 24);
+            textBoxPID.Location = new Point(131, 29);
+            textBoxPID.Margin = new Padding(3, 4, 3, 4);
             textBoxPID.Name = "textBoxPID";
-            textBoxPID.Size = new Size(100, 23);
+            textBoxPID.Size = new Size(114, 25);
             textBoxPID.TabIndex = 1;
             toolTip1.SetToolTip(textBoxPID, "输入PID");
             textBoxPID.MouseClick += textBoxPID_Focus;
@@ -183,9 +185,9 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(12, 65);
+            label2.Location = new Point(14, 76);
             label2.Name = "label2";
-            label2.Size = new Size(68, 17);
+            label2.Size = new Size(79, 20);
             label2.TabIndex = 6;
             label2.Text = "详细情况：";
             // 
@@ -197,10 +199,10 @@
             BtnSetting.FlatStyle = FlatStyle.Popup;
             BtnSetting.ImageKey = "(无)";
             BtnSetting.ImeMode = ImeMode.NoControl;
-            BtnSetting.Location = new Point(44, 4);
-            BtnSetting.Margin = new Padding(2);
+            BtnSetting.Location = new Point(49, 4);
+            BtnSetting.Margin = new Padding(2, 2, 2, 2);
             BtnSetting.Name = "BtnSetting";
-            BtnSetting.Size = new Size(36, 36);
+            BtnSetting.Size = new Size(41, 42);
             BtnSetting.TabIndex = 14;
             toolTip1.SetToolTip(BtnSetting, "设置");
             BtnSetting.UseVisualStyleBackColor = true;
@@ -215,9 +217,9 @@
             BtnOpenFloder.ImageKey = "(无)";
             BtnOpenFloder.ImeMode = ImeMode.NoControl;
             BtnOpenFloder.Location = new Point(4, 4);
-            BtnOpenFloder.Margin = new Padding(2);
+            BtnOpenFloder.Margin = new Padding(2, 2, 2, 2);
             BtnOpenFloder.Name = "BtnOpenFloder";
-            BtnOpenFloder.Size = new Size(36, 36);
+            BtnOpenFloder.Size = new Size(41, 42);
             BtnOpenFloder.TabIndex = 10;
             toolTip1.SetToolTip(BtnOpenFloder, "打开数据文件夹");
             BtnOpenFloder.UseVisualStyleBackColor = true;
@@ -231,10 +233,10 @@
             btnShotProcess.FlatStyle = FlatStyle.Popup;
             btnShotProcess.ImageKey = "(无)";
             btnShotProcess.ImeMode = ImeMode.NoControl;
-            btnShotProcess.Location = new Point(243, 17);
+            btnShotProcess.Location = new Point(278, 20);
             btnShotProcess.Margin = new Padding(1);
             btnShotProcess.Name = "btnShotProcess";
-            btnShotProcess.Size = new Size(36, 36);
+            btnShotProcess.Size = new Size(41, 42);
             btnShotProcess.TabIndex = 0;
             toolTip1.SetToolTip(btnShotProcess, "抓取进程");
             btnShotProcess.UseVisualStyleBackColor = true;
@@ -249,10 +251,10 @@
             BtnHistory.FlatStyle = FlatStyle.Popup;
             BtnHistory.ImageKey = "(无)";
             BtnHistory.ImeMode = ImeMode.NoControl;
-            BtnHistory.Location = new Point(102, 4);
-            BtnHistory.Margin = new Padding(20, 2, 2, 2);
+            BtnHistory.Location = new Point(115, 4);
+            BtnHistory.Margin = new Padding(23, 2, 2, 2);
             BtnHistory.Name = "BtnHistory";
-            BtnHistory.Size = new Size(36, 36);
+            BtnHistory.Size = new Size(41, 42);
             BtnHistory.TabIndex = 15;
             toolTip1.SetToolTip(BtnHistory, "打开历史");
             BtnHistory.UseVisualStyleBackColor = true;
@@ -325,32 +327,32 @@
             // 
             // flowLayoutPanel1
             // 
-            flowLayoutPanel1.Anchor =  AnchorStyles.Top | AnchorStyles.Right;
+            flowLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             flowLayoutPanel1.Controls.Add(BtnOpenFloder);
             flowLayoutPanel1.Controls.Add(BtnSetting);
             flowLayoutPanel1.Controls.Add(BtnHistory);
-            flowLayoutPanel1.Location = new Point(764, 24);
+            flowLayoutPanel1.Location = new Point(873, 29);
             flowLayoutPanel1.Margin = new Padding(1);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Padding = new Padding(2);
-            flowLayoutPanel1.Size = new Size(148, 44);
+            flowLayoutPanel1.Padding = new Padding(2, 2, 2, 2);
+            flowLayoutPanel1.Size = new Size(169, 51);
             flowLayoutPanel1.TabIndex = 7;
             // 
             // PlotSysCpuUsage
             // 
-            PlotSysCpuUsage.Anchor =  AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PlotSysCpuUsage.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PlotSysCpuUsage.BorderStyle = BorderStyle.FixedSingle;
-            PlotSysCpuUsage.Location = new Point(12, 336);
+            PlotSysCpuUsage.Location = new Point(14, 395);
             PlotSysCpuUsage.Margin = new Padding(1);
             PlotSysCpuUsage.Name = "PlotSysCpuUsage";
-            PlotSysCpuUsage.Size = new Size(898, 189);
+            PlotSysCpuUsage.Size = new Size(1026, 222);
             PlotSysCpuUsage.TabIndex = 8;
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(924, 554);
+            ClientSize = new Size(1056, 651);
             Controls.Add(PlotSysCpuUsage);
             Controls.Add(btnShotProcess);
             Controls.Add(flowLayoutPanel1);
@@ -359,9 +361,10 @@
             Controls.Add(label1);
             Controls.Add(LVMonitorDetail);
             Controls.Add(labelCpuAndMem);
-            Icon = (Icon) resources.GetObject("$this.Icon");
+            Font = new Font("Microsoft YaHei UI", 10.5F, FontStyle.Regular, GraphicsUnit.Point);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(1);
-            MinimumSize = new Size(938, 401);
+            MinimumSize = new Size(1070, 465);
             Name = "MainForm";
             Text = "PerfMonitor";
             FormClosing += MainForm_FormClosing;
